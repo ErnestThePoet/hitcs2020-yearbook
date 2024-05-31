@@ -1,0 +1,12 @@
+{
+  "AUTH_MANUAL_LOGIN": ["PUT", "/auth/manual_login"],
+  "AUTH_AUTO_LOGIN": ["PUT", "/auth/auto_login"],
+  "AUTH_LOGOUT": ["DELETE", "/auth/logout"],
+  "AUTH_CHANGE_PW": ["PUT", "/auth/change_pw"],
+
+  "MSG_GET_ONE": ["GET", "/msg/get_one"],
+  "MSG_GET_ALL": ["GET", "/msg/get_all"],
+  "MSG_SUBMIT": ["POST", "/msg/submit"],
+  "MSG_UPDATE": ["PUT", "/msg/update"],
+  "MSG_DELETE": ["DELETE", "/msg/delete"]
+}
