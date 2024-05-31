@@ -1,0 +1,141 @@
+@keyframes bkg-in {
+  from {
+    filter: opacity(0.3);
+  }
+
+  to {
+    filter: opacity(1);
+  }
+}
+
+@keyframes form-login-in {
+  from {
+    filter: opacity(0.3);
+    transform: translateY(-5%);
+  }
+
+  to {
+    filter: opacity(1);
+    transform: translateY(0);
+  }
+}
+
+.main {
+  width: 100vw;
+  height: 100vh;
+}
+
+@mixin flexLogoRowWrapperCommon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+}
+
+@mixin divLoginWrapperCommon {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  animation-name: bkg-in;
+  animation-duration: 1000ms;
+  animation-timing-function: ease-in-out;
+}
+
+@mixin divLoginWrapperBkgCommon($src) {
+  background: {
+    image: url($src);
+    size: cover;
+    position: center;
+    repeat: no-repeat;
+    attachment: fixed;
+  }
+}
+
+@mixin formLoginCommon {
+  padding: 50px;
+  padding-bottom: 20px;
+  width: min(500px, 90vw);
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+
+  box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.5);
+
+  animation-name: form-login-in;
+  animation-duration: 1000ms;
+  animation-timing-function: ease-in-out;
+
+  [class~="btn-login"] {
+    width: 100%;
+  }
+}
+
+.imgLogo {
+  width: fit-content;
+  height: 80px;
+}
+
+@mixin divTitleCommon($font-size) {
+  font-size: $font-size;
+  font-weight: bold;
+  color: #fff;
+}
+
+@media (width>700px) {
+  .flexLogoRowWrapper {
+    @include flexLogoRowWrapperCommon;
+    padding: 0 100px 0 30px;
+  }
+
+  .divTitle {
+    @include divTitleCommon(32px);
+  }
+
+  .divLoginWrapper {
+    @include divLoginWrapperCommon;
+    justify-content: flex-end;
+  }
+
+  .formLogin {
+    @include formLoginCommon;
+    margin-right: 100px;
+  }
+}
+
+@media (width<=700px) {
+  .flexLogoRowWrapper {
+    @include flexLogoRowWrapperCommon;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .divTitle {
+    @include divTitleCommon(24px);
+  }
+
+  .divLoginWrapper {
+    @include divLoginWrapperCommon;
+    justify-content: center;
+  }
+
+  .formLogin {
+    @include formLoginCommon;
+  }
+}
+
+.divLoginWrapperBkgH {
+  @include divLoginWrapperBkgCommon("./bkg-h.jpg");
+}
+
+.divLoginWrapperBkgV {
+  @include divLoginWrapperBkgCommon("./bkg-v.jpg");
+}
