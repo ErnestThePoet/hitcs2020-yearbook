@@ -25,11 +25,11 @@ export interface ChangePwDto {
   newPwHashed1: string;
 }
 
-export interface MessageGetOneDto {
+export interface InfoGetOneDto {
   studentId: number;
 }
 
-export interface MessageDetailItem {
+export interface InfoDetailItem {
   id: number; // 用户在数据库中的ID
   name: string; // 姓名
   studentId: string; // 学号
@@ -40,7 +40,7 @@ export interface MessageDetailItem {
   sentence: string | null; // 同学寄语（可空）
 }
 
-export interface MessageBriefItem {
+export interface InfoBriefItem {
   id: number; // 用户在数据库中的ID
   name: string; // 姓名
   studentId: string; // 学号
@@ -48,11 +48,11 @@ export interface MessageBriefItem {
   coord: [number, number]; // 城市坐标
 }
 
-export type MessageGetOneResponse = ResponseType<MessageDetailItem | null>;
+export type InfoGetOneResponse = ResponseType<InfoDetailItem | null>;
 
-export type MessageGetAllResponse = ResponseType<MessageBriefItem[]>;
+export type InfoGetAllResponse = ResponseType<InfoBriefItem[]>;
 
-export interface MessageSubmitEditDto {
+export interface InfoSubmitEditDto {
   city: string; // 城市（必填）
   coord: number[]; // 城市坐标
   contact: string | null; // 联系方式（可空）
