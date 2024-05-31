@@ -4,9 +4,9 @@
   "AUTH_LOGOUT": ["DELETE", "/auth/logout"],
   "AUTH_CHANGE_PW": ["PUT", "/auth/change_pw"],
 
-  "MSG_GET_ONE": ["GET", "/msg/get_one"],
-  "MSG_GET_ALL": ["GET", "/msg/get_all"],
-  "MSG_SUBMIT": ["POST", "/msg/submit"],
-  "MSG_UPDATE": ["PUT", "/msg/update"],
-  "MSG_DELETE": ["DELETE", "/msg/delete"]
+  "INFO_GET_ONE": ["GET", "/info/get_one"],
+  "INFO_GET_ALL": ["GET", "/info/get_all"],
+  "INFO_SUBMIT": ["POST", "/info/submit"],
+  "INFO_UPDATE": ["PUT", "/info/update"],
+  "INFO_DELETE": ["DELETE", "/info/delete"]
 }
