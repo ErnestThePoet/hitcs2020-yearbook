@@ -79,11 +79,6 @@
   }
 }
 
-.imgLogo {
-  width: fit-content;
-  height: 80px;
-}
-
 @mixin divTitleCommon($font-size) {
   font-size: $font-size;
   font-weight: bold;
