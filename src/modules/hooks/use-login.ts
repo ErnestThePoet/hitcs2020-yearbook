@@ -3,7 +3,6 @@ import { useEffect, useMemo } from "react";
 import { isFunction } from "lodash";
 import { AppDispatch } from "@/modules/store/store";
 import { REQ, handleRequest } from "@/modules/api/api";
-import { LOCAL_STORAGE_SESSION_KEY } from "../constants";
 import { setSessionData } from "../store/reducers/session/session";
 import { useNavigate } from "react-router-dom";
 import { LoginResponse } from "../api/interfaces";
@@ -13,7 +12,7 @@ export type OnLoginCallBack = (params: {
   dispatch: AppDispatch;
 }) => void;
 
-export const AutoLogin = (
+export const TryAutoLogin = (
   navigate: ReturnType<typeof useNavigate>,
   dispatch: AppDispatch,
   onLogin?: OnLoginCallBack
@@ -40,20 +39,6 @@ export const AutoLogin = (
   });
 };
 
-export const TryAutoLogin = (
-  navigate: ReturnType<typeof useNavigate>,
-  dispatch: AppDispatch,
-  onLogin?: OnLoginCallBack
-) => {
-  if (localStorage.getItem(LOCAL_STORAGE_SESSION_KEY)) {
-    AutoLogin(navigate, dispatch, onLogin);
-  } else {
-    navigate("/login", {
-      replace: true,
-    });
-  }
-};
-
 const isLoggedIn = (id: number | null) => {
   return id !== null;
 };
@@ -69,10 +54,10 @@ export function useLogin(options?: UseLoginOptions): boolean;
 
 export function useLogin(param?: OnLoginCallBack | UseLoginOptions): boolean {
   const navigate = useNavigate();
-  const id = useAppSelector((state) => state.session.id);
+  const userId = useAppSelector((state) => state.session.id);
   const dispatch = useAppDispatch();
 
-  const loggedIn = useMemo(() => isLoggedIn(id), [id]);
+  const loggedIn = useMemo(() => isLoggedIn(userId), [userId]);
 
   const isCallback = isFunction(param);
 
@@ -86,7 +71,7 @@ export function useLogin(param?: OnLoginCallBack | UseLoginOptions): boolean {
     param !== undefined && !isCallback && Boolean(param.checkLoginOnly);
 
   useEffect(() => {
-    if (id !== null) {
+    if (userId !== null) {
       onAlreadyLoggedIn?.({ navigate, dispatch });
     } else if (!checkLoginOnly) {
       TryAutoLogin(navigate, dispatch, (e) => {
