@@ -73,15 +73,13 @@ const Login: React.FC = () => {
         <Form
           className={styles.formLogin}
           name="basic"
-          // initialValues={{ remember: true }}
+          initialValues={{ remember: true }}
           onFinish={(e) => {
-            const remember = true;
-
             handleRequest(
               REQ<ManualLoginDto, LoginResponse>("AUTH_MANUAL_LOGIN", {
                 account: e.userName,
                 pwHashed1: hashSha256Utf8B64(e.password),
-                autoLogin: remember,
+                autoLogin: e.remember,
               }),
               {
                 useOnAxiosError: true,
