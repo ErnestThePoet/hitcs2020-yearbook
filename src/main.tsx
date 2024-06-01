@@ -7,12 +7,11 @@ import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // TODO
-  // <React.StrictMode>
-  <Provider store={store}>
-    <ConfigProvider locale={zhCN}>
-      <App />
-    </ConfigProvider>
-  </Provider>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <Provider store={store}>
+      <ConfigProvider locale={zhCN}>
+        <App />
+      </ConfigProvider>
+    </Provider>
+  </React.StrictMode>
 );
