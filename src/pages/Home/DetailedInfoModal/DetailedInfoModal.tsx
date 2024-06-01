@@ -54,6 +54,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
     return (
       <Modal
         className={styles.modal}
+        rootClassName={styles.modalRoot}
         centered
         open={open}
         footer={null}
