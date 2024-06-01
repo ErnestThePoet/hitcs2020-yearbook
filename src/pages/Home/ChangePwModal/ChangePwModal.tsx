@@ -144,7 +144,7 @@ export const ChangePwModal: React.FC<ChangePwModalProps> = memo(
             icon={<InfoCircleOutlined />}
             color="geekblue"
           >
-            修改密码后，您将在所有登录过的地方被退出登录
+            修改密码后，你将在所有登录过的地方被退出登录
           </Tag>
         </Flex>
       </Modal>
