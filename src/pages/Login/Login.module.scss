@@ -128,9 +128,9 @@
 }
 
 .divLoginWrapperBkgH {
-  @include divLoginWrapperBkgCommon("./bkg-h.jpg");
+  @include divLoginWrapperBkgCommon("/bkg-h.jpg");
 }
 
 .divLoginWrapperBkgV {
-  @include divLoginWrapperBkgCommon("./bkg-v.jpg");
+  @include divLoginWrapperBkgCommon("/bkg-v.jpg");
 }
