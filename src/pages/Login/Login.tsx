@@ -78,7 +78,6 @@ const Login: React.FC = () => {
       >
         <Form
           className={styles.formLogin}
-          name="basic"
           initialValues={{ remember: true }}
           onFinish={(e) => {
             handleRequest(
