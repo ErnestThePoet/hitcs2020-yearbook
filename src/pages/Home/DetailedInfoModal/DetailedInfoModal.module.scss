@@ -18,6 +18,8 @@
   }
 
   img {
+    user-select: none;
+    -webkit-user-drag: none;
     z-index: 1005;
   }
 
@@ -67,6 +69,7 @@
 
     img[class="img-location"] {
       width: 1.3em;
+      user-select: none;
       -webkit-user-drag: none;
     }
   }
