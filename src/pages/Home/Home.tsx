@@ -12,7 +12,16 @@ import {
 import { REQ, handleRequest } from "@/modules/api/api";
 import { useAppDispatch, useAppSelector } from "@/modules/store/hooks";
 import DetailedInfoModal from "./DetailedInfoModal/DetailedInfoModal";
-import { Button, Card, Drawer, Dropdown, Flex } from "antd";
+import {
+  AutoComplete,
+  Button,
+  Card,
+  Drawer,
+  Dropdown,
+  Flex,
+  Form,
+  Input,
+} from "antd";
 import {
   MenuOutlined,
   LockOutlined,
@@ -26,8 +35,19 @@ import {
   initialSessionState,
   setSessionData,
 } from "@/modules/store/reducers/session/session";
+import { DefaultOptionType } from "antd/es/select";
 
-const { BMapGL } = window as any;
+const { BMapGL, BMAP_STATUS_SUCCESS } = window as any;
+
+const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
+
+interface InfoEditFormFieldType {
+  className: string;
+  city: string;
+  contact: string;
+  mainwork: string;
+  sentence: string;
+}
 
 const Home: React.FC = () => {
   const loggedIn = useLogin();
@@ -43,6 +63,28 @@ const Home: React.FC = () => {
   const [selfInfo, setSelfInfo] = useState<InfoDetailItem | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [infoEditState, setInfoEditState] = useState<{
+    editing: boolean;
+    mode: "SUBMIT" | "EDIT";
+    point: any;
+    formInitialValues: InfoEditFormFieldType;
+  }>({
+    editing: false,
+    mode: "SUBMIT",
+    point: POINT_BEIJING,
+    formInitialValues: {
+      className: "",
+      city: "",
+      contact: "",
+      mainwork: "",
+      sentence: "",
+    },
+  });
+
+  const [cityOptions, setCityOptions] = useState<
+    { title: string; point: any }[]
+  >([]);
 
   const [modalState, setModalState] = useState<{
     detailedInfo: {
@@ -63,6 +105,16 @@ const Home: React.FC = () => {
   });
 
   const mapRef = useRef<any>(null);
+
+  const pendingLocalSearch = useRef<{
+    pending: boolean;
+    keyword: string;
+    timeout: ReturnType<typeof setTimeout>;
+  }>({
+    pending: false,
+    keyword: "",
+    timeout: 0,
+  });
 
   const syncAllInfo = useCallback(() => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
@@ -124,6 +176,44 @@ const Home: React.FC = () => {
     mapRef.current.startViewAnimation(animation);
   }, []);
 
+  const doLocalSearch = useCallback((keyword: string) => {
+    if (!mapRef.current) {
+      return;
+    }
+
+    pendingLocalSearch.current.keyword = keyword;
+
+    if (pendingLocalSearch.current.pending) {
+      return;
+    }
+
+    const localSearch = new BMapGL.LocalSearch(mapRef.current, {
+      onSearchComplete: (results: any) => {
+        if (localSearch.getStatus() === BMAP_STATUS_SUCCESS) {
+          const options: typeof cityOptions = [];
+          for (let i = 0; i < results.getCurrentNumPois(); i++) {
+            options.push({
+              title: results.getPoi(i).title,
+              point: results.getPoi(i).point,
+            });
+          }
+          setCityOptions(options);
+        }
+      },
+    });
+
+    pendingLocalSearch.current.pending = true;
+    pendingLocalSearch.current.timeout = setTimeout(() => {
+      pendingLocalSearch.current.pending = false;
+
+      if (pendingLocalSearch.current.keyword === "") {
+        return;
+      }
+
+      localSearch.search(pendingLocalSearch.current.keyword);
+    }, 200);
+  }, []);
+
   useEffect(() => {
     if (!loggedIn) {
       return;
@@ -133,7 +223,7 @@ const Home: React.FC = () => {
 
     mapRef.current = map;
 
-    map.centerAndZoom("北京市", 6);
+    map.centerAndZoom(POINT_BEIJING, 6);
     map.enableScrollWheelZoom(true);
 
     map.addControl(new BMapGL.ZoomControl());
@@ -252,7 +342,7 @@ const Home: React.FC = () => {
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
         mask={false}
-        width="min(380px, 70vw)"
+        width="min(380px, 80vw)"
         extra={
           <Dropdown
             menu={{
@@ -319,7 +409,25 @@ const Home: React.FC = () => {
                   >
                     查看
                   </Button>
-                  <Button type="link">编辑</Button>
+                  <Button
+                    type="link"
+                    onClick={() =>
+                      setInfoEditState({
+                        editing: true,
+                        mode: "EDIT",
+                        point: POINT_BEIJING,
+                        formInitialValues: {
+                          className: selfInfo.className,
+                          city: selfInfo.city,
+                          contact: selfInfo.contact ?? "",
+                          mainwork: selfInfo.mainwork ?? "",
+                          sentence: selfInfo.sentence ?? "",
+                        },
+                      })
+                    }
+                  >
+                    编辑
+                  </Button>
                   <Button type="link" danger>
                     删除
                   </Button>
@@ -328,11 +436,121 @@ const Home: React.FC = () => {
             ) : (
               <>
                 <span>✨你还没有填写同学录信息哦</span>
-                <Flex gap={10}>
-                  <Button type="link" icon={<EditOutlined />}>
-                    去填写
-                  </Button>
-                </Flex>
+                {infoEditState.editing ? (
+                  <Form
+                    className={styles.formLogin}
+                    onFinish={(e) => {
+                      console.log(e);
+                    }}
+                    initialValues={infoEditState.formInitialValues}
+                  >
+                    <Form.Item
+                      label="大学班级"
+                      name="className"
+                      rules={[
+                        {
+                          required: true,
+                          message: "请填写大学班级",
+                        },
+                        {
+                          whitespace: true,
+                          message: "请填写大学班级",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="“信息安全2班”"
+                        onChange={(e) =>
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                className: e.target.value,
+                              },
+                            })
+                          )
+                        }
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="去向城市"
+                      name="city"
+                      rules={[
+                        {
+                          required: true,
+                          message: "请填写去向城市",
+                        },
+                        {
+                          whitespace: true,
+                          message: "请填写去向城市",
+                        },
+                      ]}
+                    >
+                      <AutoComplete
+                        placeholder="“哈尔滨”"
+                        options={cityOptions.map((x, i) => ({
+                          value: x.title,
+                        }))}
+                        onSelect={(e) => {
+                          console.log("sel", e);
+                        }}
+                        onChange={(e) => {
+                          {
+                            console.log("chg", e);
+
+                            setInfoEditState((value) =>
+                              _.merge({}, value, {
+                                formInitialValues: {
+                                  city: e,
+                                },
+                              })
+                            );
+
+                            doLocalSearch(e);
+                          }
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Flex
+                        className={styles.flexInfoEditButtonWrapper}
+                        gap={15}
+                        justify="center"
+                      >
+                        <Button
+                          onClick={() =>
+                            setInfoEditState((value) => ({
+                              ...value,
+                              editing: false,
+                            }))
+                          }
+                        >
+                          取消
+                        </Button>
+                        <Button type="primary" htmlType="submit">
+                          提交
+                        </Button>
+                      </Flex>
+                    </Form.Item>
+                  </Form>
+                ) : (
+                  <Flex gap={10}>
+                    <Button
+                      type="link"
+                      icon={<EditOutlined />}
+                      onClick={() =>
+                        setInfoEditState((value) => ({
+                          ...value,
+                          editing: true,
+                          mode: "SUBMIT",
+                        }))
+                      }
+                    >
+                      去填写
+                    </Button>
+                  </Flex>
+                )}
               </>
             )}
           </Flex>
