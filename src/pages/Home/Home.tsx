@@ -21,6 +21,7 @@ import {
   Flex,
   Form,
   Input,
+  List,
   Popconfirm,
   message,
 } from "antd";
@@ -110,8 +111,47 @@ const Home: React.FC = () => {
     },
   });
 
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [displayedInfo, setDisplayedInfo] = useState<InfoBriefItem[]>([]);
+
+  const pendingSearch = useRef<{
+    pending: boolean;
+    keyword: string;
+  }>({
+    pending: false,
+    keyword: "",
+  });
+
   const mapRef = useRef<any>(null);
   const dragMarkerRef = useRef<any>(null);
+
+  const doSearch = useCallback((keyword: string) => {
+    pendingSearch.current.keyword = keyword.trim();
+
+    if (pendingSearch.current.pending) {
+      return;
+    }
+
+    pendingSearch.current.pending = true;
+
+    setTimeout(() => {
+      if (keyword === "") {
+        setDisplayedInfo(allInfo.current);
+      } else {
+        setDisplayedInfo(
+          allInfo.current.filter(
+            (x) =>
+              x.name.includes(keyword) ||
+              x.studentId.includes(keyword) ||
+              x.className.includes(keyword) ||
+              x.city.includes(keyword)
+          )
+        );
+      }
+
+      pendingSearch.current.pending = false;
+    }, 200);
+  }, []);
 
   const drawAllInfo = useCallback(() => {
     if (!mapRef.current) {
@@ -161,9 +201,10 @@ const Home: React.FC = () => {
         allInfo.current = data;
         mapRef.current?.clearOverlays();
         drawAllInfo();
+        doSearch(searchKeyword);
       },
     });
-  }, [drawAllInfo]);
+  }, [doSearch, drawAllInfo, searchKeyword]);
 
   const syncSelfInfo = useCallback(() => {
     if (userId === null) {
@@ -252,32 +293,6 @@ const Home: React.FC = () => {
     mapRef.current.startViewAnimation(animation);
   }, []);
 
-  useEffect(() => {
-    if (!loggedIn) {
-      return;
-    }
-
-    const map = new BMapGL.Map("div-map-wrapper");
-
-    mapRef.current = map;
-
-    map.centerAndZoom(POINT_BEIJING, 6);
-    map.enableScrollWheelZoom(true);
-
-    map.addControl(new BMapGL.ZoomControl());
-
-    map.updateFocusOptions({
-      open: true,
-      gray: false, // 是否使用灰度图模式
-      involve: 0, // 0 底图面线+图层 1 底图poi 2 覆盖物
-      focus: -1, // -1 全部地图使用other着色，此配置不需要商业授权；0 局部，此配置不需要商业授权
-      other: [65, 117, 250],
-    });
-
-    syncSelfInfo();
-    syncAllInfo();
-  }, [loggedIn, syncSelfInfo, syncAllInfo]);
-
   const detailedInfoModalOnCancel = useCallback(
     () =>
       setModalState((value) =>
@@ -314,6 +329,33 @@ const Home: React.FC = () => {
     dispatch(setSessionData(initialSessionState));
     navigate("/login");
   }, [dispatch, navigate]);
+
+  useEffect(() => {
+    if (!loggedIn) {
+      return;
+    }
+
+    const map = new BMapGL.Map("div-map-wrapper");
+
+    mapRef.current = map;
+
+    map.centerAndZoom(POINT_BEIJING, 6);
+    map.enableScrollWheelZoom(true);
+
+    map.addControl(new BMapGL.ZoomControl());
+
+    map.updateFocusOptions({
+      open: true,
+      gray: false, // 是否使用灰度图模式
+      involve: 0, // 0 底图面线+图层 1 底图poi 2 覆盖物
+      focus: -1, // -1 全部地图使用other着色，此配置不需要商业授权；0 局部，此配置不需要商业授权
+      other: [65, 117, 250],
+    });
+
+    syncSelfInfo();
+    syncAllInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn]);
 
   if (!loggedIn) {
     return <></>;
@@ -382,310 +424,340 @@ const Home: React.FC = () => {
           </Dropdown>
         }
       >
-        <Card className={styles.cardInfoOpWrapper}>
-          <Flex vertical gap={5} align="center">
-            {selfInfo && userId !== null && !infoEditState.editing && (
-              <>
-                <span>🌞你已经填写过同学录信息了哦</span>
-                <Flex gap={10}>
-                  <Button
-                    type="link"
-                    onClick={() =>
-                      viewDetailedInfoOf(coordToPoint(selfInfo.coord), userId)
-                    }
-                  >
-                    查看
-                  </Button>
-                  <Button
-                    type="link"
-                    onClick={() => {
-                      const selfPoint = coordToPoint(selfInfo.coord);
-
-                      setInfoEditState((value) => ({
-                        ...value,
-                        editing: true,
-                        mode: "EDIT",
-                        point: selfPoint,
-                        formInitialValues: {
-                          className: selfInfo.className,
-                          city: selfInfo.city,
-                          contact: selfInfo.contact ?? "",
-                          mainwork: selfInfo.mainwork ?? "",
-                          sentence: selfInfo.sentence ?? "",
-                        },
-                      }));
-
-                      initializeInfoSubmitEdit(selfPoint);
-                    }}
-                  >
-                    编辑
-                  </Button>
-                  <Button
-                    type="link"
-                    danger
-                    onClick={() =>
-                      setModalState((value) =>
-                        _.merge({}, value, {
-                          deleteInfo: {
-                            open: true,
-                          },
-                        })
-                      )
-                    }
-                  >
-                    删除
-                  </Button>
-                </Flex>
-              </>
-            )}
-            {!selfInfo && !infoEditState.editing && (
-              <>
-                <span>✨你还没有填写同学录信息哦</span>
-                <Flex gap={10}>
-                  <Button
-                    type="link"
-                    icon={<EditOutlined />}
-                    onClick={() => {
-                      setInfoEditState((value) => ({
-                        ...value,
-                        editing: true,
-                        mode: "SUBMIT",
-                      }));
-
-                      initializeInfoSubmitEdit();
-                    }}
-                  >
-                    去填写
-                  </Button>
-                </Flex>
-              </>
-            )}
-
-            {infoEditState.editing && (
-              <>
-                {infoEditState.mode === "SUBMIT" ? (
-                  <b>填写同学录信息</b>
-                ) : (
-                  <b>编辑同学录信息</b>
-                )}
-
-                <Form
-                  className={styles.formInfo}
-                  labelCol={{ span: 7 }}
-                  onFinish={(e: InfoEditFormFieldType) => {
-                    setInfoEditState((value) => ({
-                      ...value,
-                      loading: true,
-                    }));
-
-                    const dto: InfoSubmitEditDto = {
-                      className: e.className.trim(),
-                      city: e.city.trim(),
-                      coord: pointToCoord(dragMarkerRef.current.getPosition()),
-                      contact:
-                        e.contact.trim() === "" ? null : e.contact.trim(),
-                      mainwork:
-                        e.mainwork.trim() === "" ? null : e.mainwork.trim(),
-                      sentence:
-                        e.sentence.trim() === "" ? null : e.sentence.trim(),
-                    };
-
-                    if (!dto.className.endsWith("班")) {
-                      dto.className += "班";
-                    }
-
-                    handleRequest(
-                      REQ<InfoSubmitEditDto, ResponseType>(
-                        infoEditState.mode === "SUBMIT"
-                          ? "INFO_SUBMIT"
-                          : "INFO_UPDATE",
-                        dto
-                      ),
-                      {
-                        onSuccess: () => {
-                          message.success(
-                            infoEditState.mode === "SUBMIT"
-                              ? "成功提交同学录信息"
-                              : "成功修改同学录信息"
-                          );
-
-                          finalizeInfoSubmitEdit();
-
-                          syncSelfInfo();
-                          syncAllInfo();
-                          setInfoEditState((value) => ({
-                            ...value,
-                            editing: false,
-                          }));
-                        },
-                        onFinish: () =>
-                          setInfoEditState((value) => ({
-                            ...value,
-                            loading: false,
-                          })),
+        <Flex vertical gap={24}>
+          <Card className={styles.cardInfoOpWrapper}>
+            <Flex vertical gap={5} align="center">
+              {selfInfo && userId !== null && !infoEditState.editing && (
+                <>
+                  <span>🌞你已经填写过同学录信息了哦</span>
+                  <Flex gap={10}>
+                    <Button
+                      type="link"
+                      onClick={() =>
+                        viewDetailedInfoOf(coordToPoint(selfInfo.coord), userId)
                       }
-                    );
-                  }}
-                  initialValues={infoEditState.formInitialValues}
-                >
-                  <Form.Item
-                    label="大学班级"
-                    name="className"
-                    rules={[
-                      {
-                        required: true,
-                        message: "请填写大学班级",
-                      },
-                      {
-                        whitespace: true,
-                        message: "请填写大学班级",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="“信息安全2班”"
-                      onChange={(e) =>
-                        setInfoEditState((value) =>
+                    >
+                      查看
+                    </Button>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        const selfPoint = coordToPoint(selfInfo.coord);
+
+                        setInfoEditState((value) => ({
+                          ...value,
+                          editing: true,
+                          mode: "EDIT",
+                          point: selfPoint,
+                          formInitialValues: {
+                            className: selfInfo.className,
+                            city: selfInfo.city,
+                            contact: selfInfo.contact ?? "",
+                            mainwork: selfInfo.mainwork ?? "",
+                            sentence: selfInfo.sentence ?? "",
+                          },
+                        }));
+
+                        initializeInfoSubmitEdit(selfPoint);
+                      }}
+                    >
+                      编辑
+                    </Button>
+                    <Button
+                      type="link"
+                      danger
+                      onClick={() =>
+                        setModalState((value) =>
                           _.merge({}, value, {
-                            formInitialValues: {
-                              className: e.target.value,
+                            deleteInfo: {
+                              open: true,
                             },
                           })
                         )
                       }
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="去向城市"
-                    name="city"
-                    style={{
-                      marginBottom: 0,
-                    }}
-                    rules={[
-                      {
-                        required: true,
-                        message: "请填写去向城市",
-                      },
-                      {
-                        whitespace: true,
-                        message: "请填写去向城市",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="“哈尔滨”"
-                      onChange={(e) => {
-                        setInfoEditState((value) =>
-                          _.merge({}, value, {
-                            formInitialValues: {
-                              city: e.target.value,
-                            },
-                          })
-                        );
-                      }}
-                    />
-                  </Form.Item>
-
-                  <Flex
-                    className="flex-please-select-coord"
-                    align="center"
-                    wrap
-                  >
-                    并请在地图上选择去向地点
-                    {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
-                    <Popconfirm
-                      title="为何去向城市不支持地图检索"
-                      description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
-                      icon={<QuestionCircleOutlined />}
-                      okText="理解"
-                      showCancel={false}
                     >
-                      <Button type="link" tabIndex={-1}>
-                        (为何不支持检索?)
-                      </Button>
-                    </Popconfirm>
+                      删除
+                    </Button>
                   </Flex>
+                </>
+              )}
+              {!selfInfo && !infoEditState.editing && (
+                <>
+                  <span>✨你还没有填写同学录信息哦</span>
+                  <Flex gap={10}>
+                    <Button
+                      type="link"
+                      icon={<EditOutlined />}
+                      onClick={() => {
+                        setInfoEditState((value) => ({
+                          ...value,
+                          editing: true,
+                          mode: "SUBMIT",
+                        }));
 
-                  <Form.Item label="具体去向" name="mainwork">
-                    <Input
-                      placeholder="(选填)“哈工大计算学部”"
-                      onChange={(e) => {
-                        setInfoEditState((value) =>
-                          _.merge({}, value, {
-                            formInitialValues: {
-                              mainwork: e.target.value,
-                            },
-                          })
-                        );
+                        initializeInfoSubmitEdit();
                       }}
-                    />
-                  </Form.Item>
+                    >
+                      去填写
+                    </Button>
+                  </Flex>
+                </>
+              )}
 
-                  <Form.Item label="联系方式" name="contact">
-                    <Input
-                      placeholder="(选填)“手机15000000000”"
-                      onChange={(e) => {
-                        setInfoEditState((value) =>
-                          _.merge({}, value, {
-                            formInitialValues: {
-                              contact: e.target.value,
-                            },
-                          })
-                        );
+              {infoEditState.editing && (
+                <>
+                  {infoEditState.mode === "SUBMIT" ? (
+                    <b>填写同学录信息</b>
+                  ) : (
+                    <b>编辑同学录信息</b>
+                  )}
+
+                  <Form
+                    className={styles.formInfo}
+                    labelCol={{ span: 7 }}
+                    onFinish={(e: InfoEditFormFieldType) => {
+                      setInfoEditState((value) => ({
+                        ...value,
+                        loading: true,
+                      }));
+
+                      const dto: InfoSubmitEditDto = {
+                        className: e.className.trim(),
+                        city: e.city.trim(),
+                        coord: pointToCoord(
+                          dragMarkerRef.current.getPosition()
+                        ),
+                        contact:
+                          e.contact.trim() === "" ? null : e.contact.trim(),
+                        mainwork:
+                          e.mainwork.trim() === "" ? null : e.mainwork.trim(),
+                        sentence:
+                          e.sentence.trim() === "" ? null : e.sentence.trim(),
+                      };
+
+                      if (!dto.className.endsWith("班")) {
+                        dto.className += "班";
+                      }
+
+                      handleRequest(
+                        REQ<InfoSubmitEditDto, ResponseType>(
+                          infoEditState.mode === "SUBMIT"
+                            ? "INFO_SUBMIT"
+                            : "INFO_UPDATE",
+                          dto
+                        ),
+                        {
+                          onSuccess: () => {
+                            message.success(
+                              infoEditState.mode === "SUBMIT"
+                                ? "成功提交同学录信息"
+                                : "成功修改同学录信息"
+                            );
+
+                            finalizeInfoSubmitEdit();
+
+                            syncSelfInfo();
+                            syncAllInfo();
+                            setInfoEditState((value) => ({
+                              ...value,
+                              editing: false,
+                            }));
+                          },
+                          onFinish: () =>
+                            setInfoEditState((value) => ({
+                              ...value,
+                              loading: false,
+                            })),
+                        }
+                      );
+                    }}
+                    initialValues={infoEditState.formInitialValues}
+                  >
+                    <Form.Item
+                      label="大学班级"
+                      name="className"
+                      rules={[
+                        {
+                          required: true,
+                          message: "请填写大学班级",
+                        },
+                        {
+                          whitespace: true,
+                          message: "请填写大学班级",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="“信息安全2班”"
+                        onChange={(e) =>
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                className: e.target.value,
+                              },
+                            })
+                          )
+                        }
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="去向城市"
+                      name="city"
+                      style={{
+                        marginBottom: 0,
                       }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item label="毕业赠言" name="sentence">
-                    <Input.TextArea
-                      placeholder="(选填)"
-                      rows={5}
-                      onChange={(e) => {
-                        setInfoEditState((value) =>
-                          _.merge({}, value, {
-                            formInitialValues: {
-                              sentence: e.target.value,
-                            },
-                          })
-                        );
-                      }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item>
-                    <Flex gap={15} justify="center">
-                      <Button
-                        className="btn-bottom"
-                        onClick={() => {
-                          setInfoEditState((value) => ({
-                            ...value,
-                            editing: false,
-                          }));
-
-                          finalizeInfoSubmitEdit();
-
-                          drawAllInfo();
+                      rules={[
+                        {
+                          required: true,
+                          message: "请填写去向城市",
+                        },
+                        {
+                          whitespace: true,
+                          message: "请填写去向城市",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="“哈尔滨”"
+                        onChange={(e) => {
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                city: e.target.value,
+                              },
+                            })
+                          );
                         }}
-                        loading={infoEditState.loading}
+                      />
+                    </Form.Item>
+
+                    <Flex
+                      className="flex-please-select-coord"
+                      align="center"
+                      wrap
+                    >
+                      并请在地图上选择去向地点
+                      {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
+                      <Popconfirm
+                        title="为何去向城市不支持地图检索"
+                        description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
+                        icon={<QuestionCircleOutlined />}
+                        okText="理解"
+                        showCancel={false}
                       >
-                        取消
-                      </Button>
-                      <Button
-                        className="btn-bottom"
-                        type="primary"
-                        htmlType="submit"
-                        loading={infoEditState.loading}
-                      >
-                        提交
-                      </Button>
+                        <Button type="link" tabIndex={-1}>
+                          (为何不支持检索?)
+                        </Button>
+                      </Popconfirm>
                     </Flex>
-                  </Form.Item>
-                </Form>
-              </>
-            )}
-          </Flex>
-        </Card>
+
+                    <Form.Item label="具体去向" name="mainwork">
+                      <Input
+                        placeholder="(选填)“哈工大计算学部”"
+                        onChange={(e) => {
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                mainwork: e.target.value,
+                              },
+                            })
+                          );
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item label="联系方式" name="contact">
+                      <Input
+                        placeholder="(选填)“手机15000000000”"
+                        onChange={(e) => {
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                contact: e.target.value,
+                              },
+                            })
+                          );
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item label="毕业赠言" name="sentence">
+                      <Input.TextArea
+                        placeholder="(选填)"
+                        rows={5}
+                        onChange={(e) => {
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                sentence: e.target.value,
+                              },
+                            })
+                          );
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Flex gap={15} justify="center">
+                        <Button
+                          className="btn-bottom"
+                          onClick={() => {
+                            setInfoEditState((value) => ({
+                              ...value,
+                              editing: false,
+                            }));
+
+                            finalizeInfoSubmitEdit();
+
+                            drawAllInfo();
+                          }}
+                          loading={infoEditState.loading}
+                        >
+                          取消
+                        </Button>
+                        <Button
+                          className="btn-bottom"
+                          type="primary"
+                          htmlType="submit"
+                          loading={infoEditState.loading}
+                        >
+                          提交
+                        </Button>
+                      </Flex>
+                    </Form.Item>
+                  </Form>
+                </>
+              )}
+            </Flex>
+          </Card>
+
+          {!infoEditState.editing && (
+            <List
+              header={
+                <Input
+                  placeholder="同学录检索"
+                  allowClear
+                  value={searchKeyword}
+                  onChange={(e) => {
+                    setSearchKeyword(e.target.value);
+                    doSearch(e.target.value);
+                  }}
+                />
+              }
+              bordered
+              dataSource={displayedInfo}
+              renderItem={(item) => (
+                <List.Item>
+                  <Flex vertical gap={5}>
+                    <b>{item.name}</b>
+                    <b>{item.studentId}</b>
+                  </Flex>
+                </List.Item>
+              )}
+            />
+          )}
+        </Flex>
       </Drawer>
 
       <DetailedInfoModal
