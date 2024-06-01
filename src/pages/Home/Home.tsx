@@ -12,11 +12,12 @@ import {
 import { REQ, handleRequest } from "@/modules/api/api";
 import { useAppDispatch, useAppSelector } from "@/modules/store/hooks";
 import DetailedInfoModal from "./DetailedInfoModal/DetailedInfoModal";
-import { Button, Drawer, Dropdown } from "antd";
+import { Button, Card, Drawer, Dropdown, Flex } from "antd";
 import {
   MenuOutlined,
   LockOutlined,
   PoweroffOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 import { ChangePwModal } from "./ChangePwModal/ChangePwModal";
@@ -36,6 +37,7 @@ const Home: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const userId = useAppSelector((state) => state.session.id);
+  const userName = useAppSelector((state) => state.session.name);
 
   const [allInfo, setAllInfo] = useState<InfoBriefItem[]>([]);
   const [selfInfo, setSelfInfo] = useState<InfoDetailItem | null>(null);
@@ -82,6 +84,45 @@ const Home: React.FC = () => {
       }
     );
   }, [userId]);
+
+  const moveViewTo = useCallback((point: any, onFinish?: () => void) => {
+    if (!mapRef.current) {
+      return;
+    }
+
+    const currentCenter = mapRef.current.getCenter();
+
+    const animation = new BMapGL.ViewAnimation(
+      [
+        {
+          // MUST make a copy of mapRef.current.getCenter()
+          center: new BMapGL.Point(currentCenter.lng, currentCenter.lat),
+          zoom: mapRef.current.getZoom(),
+          tilt: 0,
+          heading: 0,
+          percentage: 0,
+        },
+        {
+          center: point,
+          zoom: 10,
+          tilt: 0,
+          heading: 0,
+          percentage: 1,
+        },
+      ],
+      {
+        duration: 500,
+        delay: 0,
+        interation: 1,
+      }
+    );
+
+    if (onFinish) {
+      animation.addEventListener("animationend", onFinish);
+    }
+
+    mapRef.current.startViewAnimation(animation);
+  }, []);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -206,59 +247,97 @@ const Home: React.FC = () => {
         onSuccess={logout}
       />
 
-      {selfInfo && (
-        <Drawer
-          title="操作中心"
-          onClose={() => setDrawerOpen(false)}
-          open={drawerOpen}
-          mask={false}
-          width="min(380px, 70vw)"
-          extra={
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "0",
-                    label: "修改密码",
-                    icon: <LockOutlined />,
-                    onClick: () =>
-                      setModalState((value) =>
-                        _.merge({}, value, {
-                          changePw: { open: true },
-                        })
-                      ),
+      <Drawer
+        title="操作中心"
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        mask={false}
+        width="min(380px, 70vw)"
+        extra={
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "0",
+                  label: "修改密码",
+                  icon: <LockOutlined />,
+                  onClick: () =>
+                    setModalState((value) =>
+                      _.merge({}, value, {
+                        changePw: { open: true },
+                      })
+                    ),
+                },
+                {
+                  key: "1",
+                  label: "退出登录",
+                  icon: <PoweroffOutlined />,
+                  onClick: () => {
+                    handleRequest(REQ<null, ResponseType>("AUTH_LOGOUT"), {
+                      onFinish: logout,
+                      suppressMessageShow: {
+                        error: true,
+                        axiosError: true,
+                        warning: true,
+                      },
+                    });
                   },
-                  {
-                    key: "1",
-                    label: "退出登录",
-                    icon: <PoweroffOutlined />,
-                    onClick: () => {
-                      handleRequest(REQ<null, ResponseType>("AUTH_LOGOUT"), {
-                        onFinish: logout,
-                        suppressMessageShow: {
-                          error: true,
-                          axiosError: true,
-                          warning: true,
-                        },
-                      });
-                    },
-                  },
-                ],
-              }}
-              placement="bottomRight"
-              arrow={{ pointAtCenter: true }}
-            >
-              <Button className={styles.btnName} type="link">
-                {selfInfo.name}
-              </Button>
-            </Dropdown>
-          }
-        >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </Drawer>
-      )}
+                },
+              ],
+            }}
+            placement="bottomRight"
+            arrow={{ pointAtCenter: true }}
+          >
+            <Button className={styles.btnName} type="link">
+              {userName}
+            </Button>
+          </Dropdown>
+        }
+      >
+        <Card className={styles.cardInfoOpWrapper}>
+          <Flex vertical gap={5} align="center">
+            {selfInfo ? (
+              <>
+                <span>🌞你已经填写过同学录信息了哦</span>
+                <Flex gap={10}>
+                  <Button
+                    type="link"
+                    onClick={() =>
+                      moveViewTo(
+                        new BMapGL.Point(selfInfo.coord[0], selfInfo.coord[1]),
+                        () =>
+                          setModalState((value) =>
+                            _.merge({}, value, {
+                              detailedInfo: {
+                                id: userId,
+                                open: true,
+                              },
+                            })
+                          )
+                      )
+                    }
+                  >
+                    查看
+                  </Button>
+                  <Button type="link">编辑</Button>
+                  <Button type="link" danger>
+                    删除
+                  </Button>
+                </Flex>
+              </>
+            ) : (
+              <>
+                <span>✨你还没有填写同学录信息哦</span>
+                <Flex gap={10}>
+                  <Button type="link" icon={<EditOutlined />}>
+                    去填写
+                  </Button>
+                </Flex>
+              </>
+            )}
+          </Flex>
+        </Card>
+      </Drawer>
     </main>
   );
 };
