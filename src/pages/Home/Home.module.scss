@@ -42,8 +42,10 @@
   }
 }
 
-.flexInfoEditButtonWrapper {
-  button[class~="ant-btn"] {
+.formInfo {
+  margin-top: 10px;
+
+  button[class~="btn-bottom"] {
     width: 30%;
   }
 }

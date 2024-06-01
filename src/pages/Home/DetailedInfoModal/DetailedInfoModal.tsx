@@ -72,7 +72,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
               <>
                 <div className="name">{detailedInfo.name}</div>
                 <div className="class-id">
-                  {detailedInfo.className}班 {detailedInfo.studentId}
+                  {detailedInfo.className} {detailedInfo.studentId}
                 </div>
                 <div className="location">
                   <img className="img-location" src="/loc.svg" alt="loc" />
