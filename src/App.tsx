@@ -1,4 +1,5 @@
 import "antd/dist/reset.css";
+import "./App.scss";
 import { RouterProvider } from "react-router-dom";
 import customRouter from "./modules/router/router";
 

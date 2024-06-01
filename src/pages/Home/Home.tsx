@@ -39,6 +39,7 @@ import {
   setSessionData,
 } from "@/modules/store/reducers/session/session";
 import { coordToPoint, pointToCoord } from "@/modules/utils/map";
+import { DeleteInfoModal } from "./DeleteInfoModal/DeleteInfoModal";
 
 const { BMapGL } = window as any;
 
@@ -93,12 +94,18 @@ const Home: React.FC = () => {
     changePw: {
       open: boolean;
     };
+    deleteInfo: {
+      open: boolean;
+    };
   }>({
     detailedInfo: {
       open: false,
       id: 0,
     },
     changePw: {
+      open: false,
+    },
+    deleteInfo: {
       open: false,
     },
   });
@@ -152,6 +159,7 @@ const Home: React.FC = () => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
       onSuccess: (data) => {
         allInfo.current = data;
+        mapRef.current?.clearOverlays();
         drawAllInfo();
       },
     });
@@ -286,6 +294,22 @@ const Home: React.FC = () => {
     []
   );
 
+  const deleteInfoModalOnCancel = useCallback(
+    () =>
+      setModalState((value) =>
+        _.merge({}, value, { deleteInfo: { open: false } })
+      ),
+    []
+  );
+
+  const deleteInfoModalOnSuccess = useCallback(() => {
+    syncSelfInfo();
+    syncAllInfo();
+    setModalState((value) =>
+      _.merge({}, value, { deleteInfo: { open: false } })
+    );
+  }, [syncAllInfo, syncSelfInfo]);
+
   const logout = useCallback(() => {
     dispatch(setSessionData(initialSessionState));
     navigate("/login");
@@ -310,18 +334,6 @@ const Home: React.FC = () => {
           />
         </div>
       )}
-
-      <DetailedInfoModal
-        open={modalState.detailedInfo.open}
-        id={modalState.detailedInfo.id}
-        onCancel={detailedInfoModalOnCancel}
-      />
-
-      <ChangePwModal
-        open={modalState.changePw.open}
-        onCancel={changePwModalOnCancel}
-        onSuccess={logout}
-      />
 
       <Drawer
         title="操作中心"
@@ -408,7 +420,19 @@ const Home: React.FC = () => {
                   >
                     编辑
                   </Button>
-                  <Button type="link" danger>
+                  <Button
+                    type="link"
+                    danger
+                    onClick={() =>
+                      setModalState((value) =>
+                        _.merge({}, value, {
+                          deleteInfo: {
+                            open: true,
+                          },
+                        })
+                      )
+                    }
+                  >
                     删除
                   </Button>
                 </Flex>
@@ -563,20 +587,24 @@ const Home: React.FC = () => {
                     />
                   </Form.Item>
 
-                  <Flex className="flex-please-select-coord" align="center" wrap>
-                      并请在地图上选择去向地点
-                      {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
-                      <Popconfirm
-                        title="为何去向城市不支持地图检索"
-                        description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
-                        icon={<QuestionCircleOutlined />}
-                        okText="理解"
-                        showCancel={false}
-                      >
-                        <Button type="link" tabIndex={-1}>
-                          (为何不支持检索?)
-                        </Button>
-                      </Popconfirm>
+                  <Flex
+                    className="flex-please-select-coord"
+                    align="center"
+                    wrap
+                  >
+                    并请在地图上选择去向地点
+                    {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
+                    <Popconfirm
+                      title="为何去向城市不支持地图检索"
+                      description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
+                      icon={<QuestionCircleOutlined />}
+                      okText="理解"
+                      showCancel={false}
+                    >
+                      <Button type="link" tabIndex={-1}>
+                        (为何不支持检索?)
+                      </Button>
+                    </Popconfirm>
                   </Flex>
 
                   <Form.Item label="具体去向" name="mainwork">
@@ -659,6 +687,24 @@ const Home: React.FC = () => {
           </Flex>
         </Card>
       </Drawer>
+
+      <DetailedInfoModal
+        open={modalState.detailedInfo.open}
+        id={modalState.detailedInfo.id}
+        onCancel={detailedInfoModalOnCancel}
+      />
+
+      <ChangePwModal
+        open={modalState.changePw.open}
+        onCancel={changePwModalOnCancel}
+        onSuccess={logout}
+      />
+
+      <DeleteInfoModal
+        open={modalState.deleteInfo.open}
+        onCancel={deleteInfoModalOnCancel}
+        onSuccess={deleteInfoModalOnSuccess}
+      />
     </main>
   );
 };

@@ -1,0 +1,7 @@
+span[class~="ant-tag"] {
+  margin: 0;
+
+  &[class~="text-block"] {
+    white-space: pre-wrap;
+  }
+}
