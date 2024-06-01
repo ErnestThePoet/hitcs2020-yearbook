@@ -135,16 +135,16 @@ const Home: React.FC = () => {
     pendingSearch.current.pending = true;
 
     setTimeout(() => {
-      if (keyword === "") {
+      if (pendingSearch.current.keyword === "") {
         setDisplayedInfo(allInfo.current);
       } else {
         setDisplayedInfo(
           allInfo.current.filter(
             (x) =>
-              x.name.includes(keyword) ||
-              x.studentId.includes(keyword) ||
-              x.className.includes(keyword) ||
-              x.city.includes(keyword)
+              x.name.includes(pendingSearch.current.keyword) ||
+              x.studentId.includes(pendingSearch.current.keyword) ||
+              x.className.includes(pendingSearch.current.keyword) ||
+              x.city.includes(pendingSearch.current.keyword)
           )
         );
       }
@@ -266,7 +266,7 @@ const Home: React.FC = () => {
         },
         {
           center: point,
-          zoom: 10,
+          zoom: 9,
           tilt: 0,
           heading: 0,
           percentage: 1,
@@ -331,7 +331,8 @@ const Home: React.FC = () => {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    if (!loggedIn) {
+    // Second condition prevents reinitializing map during development HMR
+    if (!loggedIn || mapRef.current) {
       return;
     }
 
@@ -734,6 +735,7 @@ const Home: React.FC = () => {
 
           {!infoEditState.editing && (
             <List
+              className={styles.listSearchResult}
               header={
                 <Input
                   placeholder="同学录检索"
@@ -747,11 +749,24 @@ const Home: React.FC = () => {
               }
               bordered
               dataSource={displayedInfo}
+              pagination={{
+                size: "small",
+                defaultPageSize: 20,
+                pageSizeOptions: [10, 20, 30, 50, 100, 200],
+                showSizeChanger: true,
+                showQuickJumper: true,
+              }}
               renderItem={(item) => (
-                <List.Item>
-                  <Flex vertical gap={5}>
-                    <b>{item.name}</b>
-                    <b>{item.studentId}</b>
+                <List.Item
+                  onClick={() =>
+                    viewDetailedInfoOf(coordToPoint(item.coord), item.id)
+                  }
+                >
+                  <Flex vertical>
+                    <div className="name">{item.name}</div>
+                    <div className="class-id-city">
+                      {item.className} {item.studentId} {item.city}
+                    </div>
                   </Flex>
                 </List.Item>
               )}

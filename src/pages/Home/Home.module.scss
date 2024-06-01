@@ -57,3 +57,27 @@
     }
   }
 }
+
+.listSearchResult {
+  overflow: hidden;
+
+  li[class="ant-list-item"] {
+    user-select: none;
+
+    cursor: pointer;
+
+    transition-duration: 250ms;
+
+    white-space: pre-wrap;
+
+    padding: 6px 16px;
+
+    &:hover {
+      background-color: #e8f2ff;
+    }
+
+    div[class="name"] {
+      font-weight: bold;
+    }
+  }
+}
