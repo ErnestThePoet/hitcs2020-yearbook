@@ -16,7 +16,7 @@ import {
   USER_PASSWORD_PATTERN,
 } from "@/modules/rules/user-rules";
 
-interface LoginFieldType {
+interface LoginFormFieldType {
   userName: string;
   password: string;
   remember: boolean;
@@ -118,7 +118,7 @@ const Login: React.FC = () => {
           autoComplete="off"
           labelCol={{ span: 5 }}
         >
-          <Form.Item<LoginFieldType>
+          <Form.Item<LoginFormFieldType>
             label="账号"
             name="userName"
             rules={[
@@ -132,7 +132,7 @@ const Login: React.FC = () => {
             <Input placeholder="请输入登录账号" />
           </Form.Item>
 
-          <Form.Item<LoginFieldType>
+          <Form.Item<LoginFormFieldType>
             label="密码"
             name="password"
             rules={[
@@ -146,7 +146,7 @@ const Login: React.FC = () => {
             <Input.Password placeholder="请输入登录密码" />
           </Form.Item>
 
-          <Form.Item<LoginFieldType>
+          <Form.Item<LoginFormFieldType>
             name="remember"
             valuePropName="checked"
             wrapperCol={{ offset: windowSize.w > 575 ? 5 : 0 }}
