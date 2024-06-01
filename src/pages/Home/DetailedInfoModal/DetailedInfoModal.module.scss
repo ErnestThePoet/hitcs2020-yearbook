@@ -36,21 +36,23 @@
 @mixin flexInfoWrapperCommon {
   position: relative;
 
-  font-size: 20px;
+  font-size: 18px;
   white-space: pre-wrap;
+
+  @include noto-serif-sc;
 
   z-index: 1001;
 
-  @include ma-shan-zheng-regular;
-
   [class="name"] {
+    @include ma-shan-zheng-regular;
+
     font-size: 36px;
   }
 
   [class="location"] {
     display: flex;
     align-items: center;
-    line-height: 20px;
+    line-height: 18px;
 
     img[class="img-location"] {
       width: 1.3em;
@@ -60,13 +62,13 @@
   }
 
   [class="sentence"] {
-    font-size: 18px;
-    line-height: 24px;
+    font-size: 15px;
+    line-height: 22px;
 
     max-height: 45vh;
     overflow-y: auto;
 
-    @include colored-scroll-bar(#ffe7b7, #ffecc5, #ffeecc, #f9f6e1);
+    @include colored-scroll-bar(#ffecc5, #ffecc5, #ffeecc, #f9f6e1);
   }
 }
 

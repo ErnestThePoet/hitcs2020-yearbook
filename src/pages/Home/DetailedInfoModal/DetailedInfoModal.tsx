@@ -77,7 +77,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                 <div className="location">
                   <img className="img-location" src="/loc.svg" alt="loc" />
                   {detailedInfo.city}
-                  {detailedInfo.mainwork && `,  ${detailedInfo.mainwork}`}
+                  {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
                 </div>
                 {detailedInfo.contact && (
                   <div className="contact">
@@ -85,10 +85,10 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                   </div>
                 )}
                 {detailedInfo.sentence && (
-                  <div>
+                  <Flex vertical gap={5}>
                     <div>毕业赠言：</div>
                     <div className="sentence">{detailedInfo.sentence}</div>
-                  </div>
+                  </Flex>
                 )}
               </>
             )}

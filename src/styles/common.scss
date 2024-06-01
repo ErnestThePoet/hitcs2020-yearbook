@@ -1,6 +1,13 @@
 @mixin ma-shan-zheng-regular {
-  font-family: "Times New Roman", "Ma Shan Zheng", cursive;
+  font-family: "Ma Shan Zheng", cursive;
   font-weight: 400;
+  font-style: normal;
+}
+
+@mixin noto-serif-sc {
+  font-family: "Noto Serif SC", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
   font-style: normal;
 }
 
