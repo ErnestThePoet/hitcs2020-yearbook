@@ -26,13 +26,14 @@ export interface ChangePwDto {
 }
 
 export interface InfoGetOneDto {
-  studentId: number;
+  id: number;
 }
 
 export interface InfoDetailItem {
   id: number; // 用户在数据库中的ID
   name: string; // 姓名
   studentId: string; // 学号
+  className: string; // 大学班级（必填）
   city: string; // 城市（必填）
   coord: [number, number]; // 城市坐标
   contact: string | null; // 联系方式（可空）
@@ -44,6 +45,7 @@ export interface InfoBriefItem {
   id: number; // 用户在数据库中的ID
   name: string; // 姓名
   studentId: string; // 学号
+  className: string; // 大学班级（必填）
   city: string; // 城市（必填）
   coord: [number, number]; // 城市坐标
 }
@@ -53,6 +55,7 @@ export type InfoGetOneResponse = ResponseType<InfoDetailItem | null>;
 export type InfoGetAllResponse = ResponseType<InfoBriefItem[]>;
 
 export interface InfoSubmitEditDto {
+  className: string; // 大学班级（必填）
   city: string; // 城市（必填）
   coord: number[]; // 城市坐标
   contact: string | null; // 联系方式（可空）

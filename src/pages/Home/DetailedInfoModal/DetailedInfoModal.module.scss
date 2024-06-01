@@ -1,0 +1,87 @@
+@import "../../../styles/common.scss";
+
+.modal {
+  width: min(90vw, 600px) !important;
+
+  [class="ant-modal-content"] {
+    background-color: #f9f6e1;
+  }
+
+  img {
+    z-index: 1000;
+  }
+
+  img[class="flower-tl"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(72px, 12%);
+  }
+
+  img[class="flower-bl"] {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: min(120px, 20%);
+  }
+
+  img[class="flower-br"] {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: min(120px, 20%);
+  }
+}
+
+@mixin flexInfoWrapperCommon {
+  position: relative;
+
+  font-size: 20px;
+  white-space: pre-wrap;
+
+  z-index: 1001;
+
+  @include ma-shan-zheng-regular;
+
+  [class="name"] {
+    font-size: 36px;
+  }
+
+  [class="location"] {
+    display: flex;
+    align-items: center;
+    line-height: 20px;
+
+    img[class="img-location"] {
+      width: 1.3em;
+      margin-right: 5px;
+      -webkit-user-drag: none;
+    }
+  }
+
+  [class="sentence"] {
+    font-size: 18px;
+    line-height: 24px;
+
+    max-height: 45vh;
+    overflow-y: auto;
+
+    @include colored-scroll-bar(#ffe7b7, #ffecc5, #ffeecc, #f9f6e1);
+  }
+}
+
+@media (width<=700px) {
+  .flexInfoWrapper {
+    @include flexInfoWrapperCommon;
+
+    padding: 30px 10px;
+  }
+}
+
+@media (width>700px) {
+  .flexInfoWrapper {
+    @include flexInfoWrapperCommon;
+
+    padding: 30px 60px;
+  }
+}
