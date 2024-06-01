@@ -8,6 +8,8 @@ import {
   USER_PASSWORD_PATTERN,
 } from "@/modules/rules/user-rules";
 import { ChangePwDto, ResponseType } from "@/modules/api/interfaces";
+import classNames from "classnames";
+import styles from "./ChangePwModal.module.scss";
 
 interface ChangePwModalProps {
   open: boolean;
@@ -68,7 +70,7 @@ export const ChangePwModal: React.FC<ChangePwModalProps> = memo(
               newPassword2: "",
             }}
             form={form}
-            labelCol={{ span: 5 }}
+            labelCol={{ span: 4 }}
           >
             <Form.Item<ChangePwModalFormFieldType>
               name="oldPassword"
@@ -140,11 +142,11 @@ export const ChangePwModal: React.FC<ChangePwModalProps> = memo(
           </Form>
 
           <Tag
-            className="text-block"
+            className={classNames("text-block", styles.tagTip)}
             icon={<InfoCircleOutlined />}
             color="geekblue"
           >
-            修改密码后，你将在所有登录过的地方被退出登录
+            修改密码后，你将在所有登录过的地方被退出登录。
           </Tag>
         </Flex>
       </Modal>
