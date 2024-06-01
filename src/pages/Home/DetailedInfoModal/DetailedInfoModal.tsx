@@ -11,11 +11,11 @@ import styles from "./DetailedInfoModal.module.scss";
 interface DetailedInfoModalProps {
   open: boolean;
   id: number;
-  onClose: () => void;
+  onCancel: () => void;
 }
 
 const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
-  ({ open, id, onClose }) => {
+  ({ open, id, onCancel }) => {
     const [detailedInfo, setDetailedInfo] = useState<InfoDetailItem | null>(
       null
     );
@@ -57,7 +57,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
         centered
         open={open}
         footer={null}
-        onCancel={onClose}
+        onCancel={onCancel}
       >
         <>
           <img className="flower-tl" src="/flowertl.png" alt="flower" />

@@ -7,28 +7,57 @@ import {
   InfoGetAllResponse,
   InfoGetOneDto,
   InfoGetOneResponse,
+  ResponseType,
 } from "@/modules/api/interfaces";
 import { REQ, handleRequest } from "@/modules/api/api";
-import { useAppSelector } from "@/modules/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/modules/store/hooks";
 import DetailedInfoModal from "./DetailedInfoModal/DetailedInfoModal";
+import { Button, Drawer, Dropdown } from "antd";
+import {
+  MenuOutlined,
+  LockOutlined,
+  PoweroffOutlined,
+} from "@ant-design/icons";
+import _ from "lodash";
+import { ChangePwModal } from "./ChangePwModal/ChangePwModal";
+import { useNavigate } from "react-router-dom";
+import {
+  initialSessionState,
+  setSessionData,
+} from "@/modules/store/reducers/session/session";
 
 const { BMapGL } = window as any;
 
 const Home: React.FC = () => {
   const loggedIn = useLogin();
 
+  const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+
   const userId = useAppSelector((state) => state.session.id);
 
   const [allInfo, setAllInfo] = useState<InfoBriefItem[]>([]);
   const [selfInfo, setSelfInfo] = useState<InfoDetailItem | null>(null);
-  const detailedInfoMap = useRef<Map<number, InfoDetailItem>>(new Map());
 
-  const [detailedInfoModalState, setDetailedInfoModalState] = useState<{
-    open: boolean;
-    id: number;
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [modalState, setModalState] = useState<{
+    detailedInfo: {
+      open: boolean;
+      id: number;
+    };
+    changePw: {
+      open: boolean;
+    };
   }>({
-    open: false,
-    id: 0,
+    detailedInfo: {
+      open: false,
+      id: 0,
+    },
+    changePw: {
+      open: false,
+    },
   });
 
   const mapRef = useRef<any>(null);
@@ -108,10 +137,14 @@ const Home: React.FC = () => {
       marker.setLabel(label);
 
       const clickListener = () =>
-        setDetailedInfoModalState({
-          id: info.id,
-          open: true,
-        });
+        setModalState((value) =>
+          _.merge({}, value, {
+            detailedInfo: {
+              open: true,
+              id: info.id,
+            },
+          })
+        );
 
       marker.addEventListener("click", clickListener);
       label.addEventListener("click", clickListener);
@@ -119,6 +152,27 @@ const Home: React.FC = () => {
       mapRef.current.addOverlay(marker);
     }
   }, [allInfo]);
+
+  const detailedInfoModalOnCancel = useCallback(
+    () =>
+      setModalState((value) =>
+        _.merge({}, value, { detailedInfo: { open: false } })
+      ),
+    []
+  );
+
+  const changePwModalOnCancel = useCallback(
+    () =>
+      setModalState((value) =>
+        _.merge({}, value, { changePw: { open: false } })
+      ),
+    []
+  );
+
+  const logout = useCallback(() => {
+    dispatch(setSessionData(initialSessionState));
+    navigate("/login");
+  }, [dispatch, navigate]);
 
   if (!loggedIn) {
     return <></>;
@@ -128,13 +182,83 @@ const Home: React.FC = () => {
     <main className={styles.main}>
       <div id="div-map-wrapper" className={styles.divMapWrapper} />
 
+      {!drawerOpen && (
+        <div className={styles.divMenuButtonWrapper}>
+          <Button
+            className="menu-button"
+            icon={<MenuOutlined />}
+            shape="circle"
+            size="large"
+            onClick={() => setDrawerOpen(true)}
+          />
+        </div>
+      )}
+
       <DetailedInfoModal
-        open={detailedInfoModalState.open}
-        id={detailedInfoModalState.id}
-        onClose={() =>
-          setDetailedInfoModalState((value) => ({ ...value, open: false }))
-        }
+        open={modalState.detailedInfo.open}
+        id={modalState.detailedInfo.id}
+        onCancel={detailedInfoModalOnCancel}
       />
+
+      <ChangePwModal
+        open={modalState.changePw.open}
+        onCancel={changePwModalOnCancel}
+        onSuccess={logout}
+      />
+
+      {selfInfo && (
+        <Drawer
+          title="操作中心"
+          onClose={() => setDrawerOpen(false)}
+          open={drawerOpen}
+          mask={false}
+          width="min(380px, 70vw)"
+          extra={
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "0",
+                    label: "修改密码",
+                    icon: <LockOutlined />,
+                    onClick: () =>
+                      setModalState((value) =>
+                        _.merge({}, value, {
+                          changePw: { open: true },
+                        })
+                      ),
+                  },
+                  {
+                    key: "1",
+                    label: "退出登录",
+                    icon: <PoweroffOutlined />,
+                    onClick: () => {
+                      handleRequest(REQ<null, ResponseType>("AUTH_LOGOUT"), {
+                        onFinish: logout,
+                        suppressMessageShow: {
+                          error: true,
+                          axiosError: true,
+                          warning: true,
+                        },
+                      });
+                    },
+                  },
+                ],
+              }}
+              placement="bottomRight"
+              arrow={{ pointAtCenter: true }}
+            >
+              <Button className={styles.btnName} type="link">
+                {selfInfo.name}
+              </Button>
+            </Dropdown>
+          }
+        >
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </Drawer>
+      )}
     </main>
   );
 };

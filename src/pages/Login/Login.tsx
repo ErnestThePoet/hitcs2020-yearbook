@@ -9,6 +9,12 @@ import { useLogin } from "@/modules/hooks/use-login";
 import { LoginResponse, ManualLoginDto } from "@/modules/api/interfaces";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
+import {
+  USER_ACCOUNT_HINT,
+  USER_ACCOUNT_PATTERN,
+  USER_PASSWORD_HINT,
+  USER_PASSWORD_PATTERN,
+} from "@/modules/rules/user-rules";
 
 interface LoginFieldType {
   userName: string;
@@ -119,8 +125,8 @@ const Login: React.FC = () => {
             rules={[
               { required: true, message: "请输入登录账号" },
               {
-                pattern: /^[\w-]{4,12}$/,
-                message: "登录账号非法",
+                pattern: USER_ACCOUNT_PATTERN,
+                message: USER_ACCOUNT_HINT,
               },
             ]}
           >
@@ -133,12 +139,8 @@ const Login: React.FC = () => {
             rules={[
               { required: true, message: "请输入登录密码" },
               {
-                min: 6,
-                message: "密码长度为6-15",
-              },
-              {
-                max: 15,
-                message: "密码长度为6-15",
+                pattern: USER_PASSWORD_PATTERN,
+                message: USER_PASSWORD_HINT,
               },
             ]}
           >
