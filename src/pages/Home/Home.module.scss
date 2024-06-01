@@ -48,4 +48,12 @@
   button[class~="btn-bottom"] {
     width: 30%;
   }
+
+  [class~="flex-please-select-coord"] {
+    font-weight: bold;
+
+    button[class~="ant-btn"] {
+      font-weight: bold;
+    }
+  }
 }

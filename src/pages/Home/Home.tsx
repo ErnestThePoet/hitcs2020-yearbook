@@ -39,7 +39,6 @@ import {
   setSessionData,
 } from "@/modules/store/reducers/session/session";
 import { coordToPoint, pointToCoord } from "@/modules/utils/map";
-import { isMobileBrowser } from "@/modules/utils/dom-utils";
 
 const { BMapGL } = window as any;
 
@@ -329,7 +328,7 @@ const Home: React.FC = () => {
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
         mask={false}
-        width="min(380px, 80vw)"
+        width="min(390px, 80vw)"
         extra={
           <Dropdown
             menu={{
@@ -448,6 +447,7 @@ const Home: React.FC = () => {
 
                 <Form
                   className={styles.formInfo}
+                  labelCol={{ span: 7 }}
                   onFinish={(e: InfoEditFormFieldType) => {
                     setInfoEditState((value) => ({
                       ...value,
@@ -563,20 +563,20 @@ const Home: React.FC = () => {
                     />
                   </Form.Item>
 
-                  <Flex align="center" wrap>
-                    并请在地图上选择去向地点
-                    {isMobileBrowser() && "(可关闭侧栏)"}
-                    <Popconfirm
-                      title="为何去向城市不支持地图检索"
-                      description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标😚"
-                      icon={<QuestionCircleOutlined />}
-                      okText="理解"
-                      showCancel={false}
-                    >
-                      <Button type="link" tabIndex={-1}>
-                        (为何不支持检索?)
-                      </Button>
-                    </Popconfirm>
+                  <Flex className="flex-please-select-coord" align="center" wrap>
+                      并请在地图上选择去向地点
+                      {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
+                      <Popconfirm
+                        title="为何去向城市不支持地图检索"
+                        description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
+                        icon={<QuestionCircleOutlined />}
+                        okText="理解"
+                        showCancel={false}
+                      >
+                        <Button type="link" tabIndex={-1}>
+                          (为何不支持检索?)
+                        </Button>
+                      </Popconfirm>
                   </Flex>
 
                   <Form.Item label="具体去向" name="mainwork">
