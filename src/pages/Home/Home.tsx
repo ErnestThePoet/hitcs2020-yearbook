@@ -150,7 +150,7 @@ const Home: React.FC = () => {
       }
 
       pendingSearch.current.pending = false;
-    }, 200);
+    }, 100);
   }, []);
 
   const drawAllInfo = useCallback(() => {
