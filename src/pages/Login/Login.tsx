@@ -115,7 +115,6 @@ const Login: React.FC = () => {
               }
             );
           }}
-          autoComplete="off"
           labelCol={{ span: 5 }}
         >
           <Form.Item<LoginFormFieldType>
