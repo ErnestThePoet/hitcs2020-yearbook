@@ -12,16 +12,7 @@ import {
 import { REQ, handleRequest } from "@/modules/api/api";
 import { useAppDispatch, useAppSelector } from "@/modules/store/hooks";
 import DetailedInfoModal from "./DetailedInfoModal/DetailedInfoModal";
-import {
-  AutoComplete,
-  Button,
-  Card,
-  Drawer,
-  Dropdown,
-  Flex,
-  Form,
-  Input,
-} from "antd";
+import { Button, Card, Drawer, Dropdown, Flex, Form, Input } from "antd";
 import {
   MenuOutlined,
   LockOutlined,
@@ -35,9 +26,9 @@ import {
   initialSessionState,
   setSessionData,
 } from "@/modules/store/reducers/session/session";
-import { DefaultOptionType } from "antd/es/select";
+import { coordToPoint } from "@/modules/utils/map";
 
-const { BMapGL, BMAP_STATUS_SUCCESS } = window as any;
+const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
 
@@ -82,10 +73,6 @@ const Home: React.FC = () => {
     },
   });
 
-  const [cityOptions, setCityOptions] = useState<
-    { title: string; point: any }[]
-  >([]);
-
   const [modalState, setModalState] = useState<{
     detailedInfo: {
       open: boolean;
@@ -105,16 +92,6 @@ const Home: React.FC = () => {
   });
 
   const mapRef = useRef<any>(null);
-
-  const pendingLocalSearch = useRef<{
-    pending: boolean;
-    keyword: string;
-    timeout: ReturnType<typeof setTimeout>;
-  }>({
-    pending: false,
-    keyword: "",
-    timeout: 0,
-  });
 
   const syncAllInfo = useCallback(() => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
@@ -176,44 +153,6 @@ const Home: React.FC = () => {
     mapRef.current.startViewAnimation(animation);
   }, []);
 
-  const doLocalSearch = useCallback((keyword: string) => {
-    if (!mapRef.current) {
-      return;
-    }
-
-    pendingLocalSearch.current.keyword = keyword;
-
-    if (pendingLocalSearch.current.pending) {
-      return;
-    }
-
-    const localSearch = new BMapGL.LocalSearch(mapRef.current, {
-      onSearchComplete: (results: any) => {
-        if (localSearch.getStatus() === BMAP_STATUS_SUCCESS) {
-          const options: typeof cityOptions = [];
-          for (let i = 0; i < results.getCurrentNumPois(); i++) {
-            options.push({
-              title: results.getPoi(i).title,
-              point: results.getPoi(i).point,
-            });
-          }
-          setCityOptions(options);
-        }
-      },
-    });
-
-    pendingLocalSearch.current.pending = true;
-    pendingLocalSearch.current.timeout = setTimeout(() => {
-      pendingLocalSearch.current.pending = false;
-
-      if (pendingLocalSearch.current.keyword === "") {
-        return;
-      }
-
-      localSearch.search(pendingLocalSearch.current.keyword);
-    }, 200);
-  }, []);
-
   useEffect(() => {
     if (!loggedIn) {
       return;
@@ -247,9 +186,7 @@ const Home: React.FC = () => {
     }
 
     for (const info of allInfo) {
-      const marker = new BMapGL.Marker(
-        new BMapGL.Point(info.coord[0], info.coord[1])
-      );
+      const marker = new BMapGL.Marker(coordToPoint(info.coord));
 
       const label = new BMapGL.Label(info.name, {
         offset: new BMapGL.Size(15, -22),
@@ -393,17 +330,15 @@ const Home: React.FC = () => {
                   <Button
                     type="link"
                     onClick={() =>
-                      moveViewTo(
-                        new BMapGL.Point(selfInfo.coord[0], selfInfo.coord[1]),
-                        () =>
-                          setModalState((value) =>
-                            _.merge({}, value, {
-                              detailedInfo: {
-                                id: userId,
-                                open: true,
-                              },
-                            })
-                          )
+                      moveViewTo(coordToPoint(selfInfo.coord), () =>
+                        setModalState((value) =>
+                          _.merge({}, value, {
+                            detailedInfo: {
+                              id: userId,
+                              open: true,
+                            },
+                          })
+                        )
                       )
                     }
                   >
@@ -415,7 +350,7 @@ const Home: React.FC = () => {
                       setInfoEditState({
                         editing: true,
                         mode: "EDIT",
-                        point: POINT_BEIJING,
+                        point: coordToPoint(selfInfo.coord),
                         formInitialValues: {
                           className: selfInfo.className,
                           city: selfInfo.city,
@@ -486,28 +421,16 @@ const Home: React.FC = () => {
                         },
                       ]}
                     >
-                      <AutoComplete
+                      <Input
                         placeholder="“哈尔滨”"
-                        options={cityOptions.map((x, i) => ({
-                          value: x.title,
-                        }))}
-                        onSelect={(e) => {
-                          console.log("sel", e);
-                        }}
                         onChange={(e) => {
-                          {
-                            console.log("chg", e);
-
-                            setInfoEditState((value) =>
-                              _.merge({}, value, {
-                                formInitialValues: {
-                                  city: e,
-                                },
-                              })
-                            );
-
-                            doLocalSearch(e);
-                          }
+                          setInfoEditState((value) =>
+                            _.merge({}, value, {
+                              formInitialValues: {
+                                city: e.target.value,
+                              },
+                            })
+                          );
                         }}
                       />
                     </Form.Item>
