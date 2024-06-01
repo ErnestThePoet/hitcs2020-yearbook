@@ -48,6 +48,7 @@
 
   font-size: 18px;
   white-space: pre-wrap;
+  word-break: break-all;
 
   @include noto-serif-sc;
 
@@ -66,16 +67,20 @@
 
     img[class="img-location"] {
       width: 1.3em;
-      margin-right: 5px;
       -webkit-user-drag: none;
     }
+  }
+
+  [class="contact"] {
+    font-size: 15px;
+    line-height: 22px;
   }
 
   [class="sentence"] {
     font-size: 15px;
     line-height: 22px;
 
-    max-height: 45vh;
+    max-height: 40vh;
     overflow-y: auto;
 
     @include colored-scroll-bar(#ffecc5, #ffecc5, #ffeecc, #f9f6e1);

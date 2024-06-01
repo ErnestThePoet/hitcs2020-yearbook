@@ -66,7 +66,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
           <img className="flower-br" src="/flowerbr.png" alt="flower" />
         </>
         {detailedInfo ? (
-          <Flex className={styles.flexInfoWrapper} vertical gap={5}>
+          <Flex className={styles.flexInfoWrapper} vertical gap={8}>
             {loading ? (
               <Skeleton active />
             ) : (
@@ -81,9 +81,10 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                   {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
                 </div>
                 {detailedInfo.contact && (
-                  <div className="contact">
-                    联系方式：{detailedInfo.contact}
-                  </div>
+                  <Flex vertical gap={5}>
+                    <div>联系方式：</div>
+                    <div className="contact">{detailedInfo.contact}</div>
+                  </Flex>
                 )}
                 {detailedInfo.sentence && (
                   <Flex vertical gap={5}>
