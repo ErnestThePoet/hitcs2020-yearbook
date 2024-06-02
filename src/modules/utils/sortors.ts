@@ -1,13 +1,7 @@
 import { Maybe } from "./types";
 
 function stringCompare(a: string, b: string): number {
-  if (a < b) {
-    return -1;
-  } else if (a === b) {
-    return 0;
-  } else {
-    return 1;
-  }
+  return a.localeCompare(b);
 }
 
 function getNested<T>(obj: any, keys: string[]): Maybe<T> {
