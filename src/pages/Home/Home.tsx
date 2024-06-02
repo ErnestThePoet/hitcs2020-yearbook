@@ -27,6 +27,8 @@ import {
 } from "antd";
 import {
   MenuOutlined,
+  SoundOutlined,
+  MutedOutlined,
   LockOutlined,
   PoweroffOutlined,
   EditOutlined,
@@ -115,6 +117,8 @@ const Home: React.FC = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [displayedInfo, setDisplayedInfo] = useState<InfoBriefItem[]>([]);
 
+  const [bgmPlaying, setBgmPlaying] = useState(false);
+
   const pendingSearch = useRef<{
     pending: boolean;
     keyword: string;
@@ -125,6 +129,22 @@ const Home: React.FC = () => {
 
   const mapRef = useRef<any>(null);
   const dragMarkerRef = useRef<any>(null);
+
+  const bgmAudio = useRef<HTMLAudioElement | null>(null);
+
+  const toggleBgmPlay = useCallback(() => {
+    if (!bgmAudio.current || !(bgmAudio.current.readyState > 2)) {
+      return;
+    }
+
+    if (bgmAudio.current.paused) {
+      bgmAudio.current.play();
+      setBgmPlaying(true);
+    } else {
+      bgmAudio.current.pause();
+      setBgmPlaying(false);
+    }
+  }, []);
 
   const doSearch = useCallback((keyword: string) => {
     pendingSearch.current.keyword = keyword.trim().toLowerCase();
@@ -344,18 +364,28 @@ const Home: React.FC = () => {
 
   return (
     <main className={styles.main}>
+      <audio autoPlay loop ref={bgmAudio}>
+        <source src="bgm.mp3" />
+      </audio>
+
       <div id="div-map-wrapper" className={styles.divMapWrapper} />
 
       {!drawerOpen && (
-        <div className={styles.divMenuButtonWrapper}>
+        <Flex className={styles.flexFloatingButtonsWrapper} vertical gap={10}>
           <Button
-            className="menu-button"
             icon={<MenuOutlined />}
             shape="circle"
             size="large"
             onClick={() => setDrawerOpen(true)}
           />
-        </div>
+
+          <Button
+            icon={bgmPlaying ? <SoundOutlined /> : <MutedOutlined />}
+            shape="circle"
+            size="large"
+            onClick={toggleBgmPlay}
+          />
+        </Flex>
       )}
 
       <Drawer

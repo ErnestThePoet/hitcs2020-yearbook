@@ -8,14 +8,14 @@
   height: 100%;
 }
 
-.divMenuButtonWrapper {
+.flexFloatingButtonsWrapper {
   position: fixed;
   top: 15px;
   right: 15px;
 
   z-index: 999;
 
-  button[class~="menu-button"] {
+  button[class~="ant-btn"] {
     box-shadow: 0px 3px 5px 0px #b8b8b8;
 
     &:hover {
