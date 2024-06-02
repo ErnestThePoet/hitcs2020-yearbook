@@ -149,13 +149,27 @@ const Login: React.FC = () => {
             className="form-item-remember"
             name="remember"
             valuePropName="checked"
-            wrapperCol={{ offset: windowSize.w > 575 ? 4 : 0 }}
+            wrapperCol={{
+              xs: {
+                offset: 0,
+              },
+              sm: {
+                offset: 4,
+              },
+            }}
           >
             <Checkbox>7日内自动登录</Checkbox>
           </Form.Item>
 
           <Form.Item
-            wrapperCol={{ offset: windowSize.w > 575 ? 4 : 0 }}
+            wrapperCol={{
+              xs: {
+                offset: 0,
+              },
+              sm: {
+                offset: 4,
+              },
+            }}
             validateStatus={loginError ? "error" : "success"}
             help={loginErrorMessage}
           >
