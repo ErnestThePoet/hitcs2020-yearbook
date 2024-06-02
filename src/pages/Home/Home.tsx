@@ -34,6 +34,7 @@ import {
   EditOutlined,
   QuestionCircleOutlined,
   UserOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 import { ChangePwModal } from "./ChangePwModal/ChangePwModal";
@@ -45,6 +46,7 @@ import {
 import { coordToPoint, pointToCoord } from "@/modules/utils/map";
 import { DeleteInfoModal } from "./DeleteInfoModal/DeleteInfoModal";
 import { getStringSorter } from "@/modules/utils/sortors";
+import AboutModal from "./AboutModal/AboutModal";
 
 const { BMapGL } = window as any;
 
@@ -102,6 +104,9 @@ const Home: React.FC = () => {
     deleteInfo: {
       open: boolean;
     };
+    about: {
+      open: boolean;
+    };
   }>({
     detailedInfo: {
       open: false,
@@ -111,6 +116,9 @@ const Home: React.FC = () => {
       open: false,
     },
     deleteInfo: {
+      open: false,
+    },
+    about: {
       open: false,
     },
   });
@@ -334,6 +342,12 @@ const Home: React.FC = () => {
     );
   }, [syncAllInfo, syncSelfInfo]);
 
+  const aboutModalOnCancel = useCallback(
+    () =>
+      setModalState((value) => _.merge({}, value, { about: { open: false } })),
+    []
+  );
+
   const logout = useCallback(() => {
     dispatch(setSessionData(initialSessionState));
     navigate("/login");
@@ -372,7 +386,12 @@ const Home: React.FC = () => {
       <div id="div-map-wrapper" className={styles.divMapWrapper} />
 
       {!drawerOpen && (
-        <Flex className={styles.flexFloatingButtonsWrapper} vertical gap={10}>
+        <Flex
+          className={styles.flexFloatingButtonsWrapper}
+          vertical
+          gap={10}
+          align="center"
+        >
           <Button
             icon={<MenuOutlined />}
             shape="circle"
@@ -385,6 +404,17 @@ const Home: React.FC = () => {
             shape="circle"
             size="large"
             onClick={toggleBgmPlay}
+          />
+
+          <Button
+            icon={<HeartOutlined />}
+            shape="circle"
+            size="large"
+            onClick={() =>
+              setModalState((value) =>
+                _.merge({}, value, { about: { open: true } })
+              )
+            }
           />
         </Flex>
       )}
@@ -826,6 +856,8 @@ const Home: React.FC = () => {
         onCancel={deleteInfoModalOnCancel}
         onSuccess={deleteInfoModalOnSuccess}
       />
+
+      <AboutModal open={modalState.about.open} onCancel={aboutModalOnCancel} />
     </main>
   );
 };
