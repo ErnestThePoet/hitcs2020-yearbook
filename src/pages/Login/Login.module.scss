@@ -93,6 +93,12 @@
   button[class~="btn-login"] {
     width: 100%;
   }
+
+  div[class~="form-item-remember"] {
+    div[class="ant-form-item-control-input"] {
+      min-height: unset;
+    }
+  }
 }
 
 @mixin divTitleCommon($font-size) {

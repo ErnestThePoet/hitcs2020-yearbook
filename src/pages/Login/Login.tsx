@@ -146,6 +146,7 @@ const Login: React.FC = () => {
           </Form.Item>
 
           <Form.Item<LoginFormFieldType>
+            className="form-item-remember"
             name="remember"
             valuePropName="checked"
             wrapperCol={{ offset: windowSize.w > 575 ? 4 : 0 }}
