@@ -51,6 +51,7 @@ import AboutModal from "./AboutModal/AboutModal";
 const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
+const WITH_LABEL_ZOOM = 5.5;
 
 interface InfoEditFormFieldType {
   className: string;
@@ -75,6 +76,7 @@ const Home: React.FC = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const infoEditingRef = useRef(false);
   const [infoEditState, setInfoEditState] = useState<{
     editing: boolean;
     loading: boolean;
@@ -138,6 +140,7 @@ const Home: React.FC = () => {
 
   const mapRef = useRef<any>(null);
   const dragMarkerRef = useRef<any>(null);
+  const mapZoomStartZoom = useRef(0);
 
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
@@ -185,31 +188,13 @@ const Home: React.FC = () => {
     }, 100);
   }, []);
 
-  const drawAllInfo = useCallback(() => {
+  const drawAllInfo = useCallback((withLabel: boolean) => {
     if (!mapRef.current) {
       return;
     }
 
     // TODO 实现聚簇
     for (const info of allInfo.current) {
-      const marker = new BMapGL.Marker(coordToPoint(info.coord));
-
-      const label = new BMapGL.Label(info.name, {
-        offset: new BMapGL.Size(15, -22),
-      });
-      label.setStyle({
-        backgroundColor: "#fef6d5",
-        color: "#ea6500",
-        borderRadius: "10px",
-        borderColor: "#ccc",
-        padding: "0 5px",
-        fontSize: "12px",
-        lineHeight: "20px",
-        cursor: "pointer",
-      });
-
-      marker.setLabel(label);
-
       const clickListener = () =>
         setModalState((value) =>
           _.merge({}, value, {
@@ -220,9 +205,29 @@ const Home: React.FC = () => {
           })
         );
 
-      marker.addEventListener("click", clickListener);
-      label.addEventListener("click", clickListener);
+      const marker = new BMapGL.Marker(coordToPoint(info.coord));
 
+      if (withLabel) {
+        const label = new BMapGL.Label(info.name, {
+          offset: new BMapGL.Size(15, -22),
+        });
+        label.setStyle({
+          backgroundColor: "#fef6d5",
+          color: "#ea6500",
+          borderRadius: "10px",
+          borderColor: "#ccc",
+          padding: "0 5px",
+          fontSize: "12px",
+          lineHeight: "20px",
+          cursor: "pointer",
+        });
+
+        label.addEventListener("click", clickListener);
+
+        marker.setLabel(label);
+      }
+
+      marker.addEventListener("click", clickListener);
       mapRef.current.addOverlay(marker);
     }
   }, []);
@@ -231,9 +236,12 @@ const Home: React.FC = () => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
       onSuccess: (data) => {
         allInfo.current = data;
-        mapRef.current?.clearOverlays();
-        drawAllInfo();
         doSearch(searchKeyword);
+
+        if (mapRef.current) {
+          mapRef.current.clearOverlays();
+          drawAllInfo(mapRef.current.getZoom() > WITH_LABEL_ZOOM);
+        }
       },
     });
   }, [doSearch, drawAllInfo, searchKeyword]);
@@ -283,6 +291,8 @@ const Home: React.FC = () => {
     mapRef.current.addOverlay(dragMarker);
 
     dragMarkerRef.current = dragMarker;
+
+    infoEditingRef.current = true;
   }, []);
 
   const finalizeInfoSubmitEdit = useCallback(() => {
@@ -293,6 +303,8 @@ const Home: React.FC = () => {
     mapRef.current.clearOverlays();
 
     dragMarkerRef.current = null;
+
+    infoEditingRef.current = false;
   }, []);
 
   const goToLocation = useCallback((point: any) => {
@@ -367,6 +379,30 @@ const Home: React.FC = () => {
     map.enableScrollWheelZoom(true);
 
     map.addControl(new BMapGL.ZoomControl());
+
+    map.addEventListener("zoomstart", () => {
+      mapZoomStartZoom.current = map.getZoom();
+    });
+
+    map.addEventListener("zoomend", () => {
+      if (infoEditingRef.current) {
+        return;
+      }
+
+      if (
+        mapZoomStartZoom.current <= WITH_LABEL_ZOOM &&
+        map.getZoom() > WITH_LABEL_ZOOM
+      ) {
+        map.clearOverlays();
+        drawAllInfo(true);
+      } else if (
+        mapZoomStartZoom.current > WITH_LABEL_ZOOM &&
+        map.getZoom() <= WITH_LABEL_ZOOM
+      ) {
+        map.clearOverlays();
+        drawAllInfo(false);
+      }
+    });
 
     syncSelfInfo();
     syncAllInfo();
@@ -760,14 +796,18 @@ const Home: React.FC = () => {
                         <Button
                           className="btn-bottom"
                           onClick={() => {
+                            finalizeInfoSubmitEdit();
+
+                            if (mapRef.current) {
+                              drawAllInfo(
+                                mapRef.current.getZoom() > WITH_LABEL_ZOOM
+                              );
+                            }
+
                             setInfoEditState((value) => ({
                               ...value,
                               editing: false,
                             }));
-
-                            finalizeInfoSubmitEdit();
-
-                            drawAllInfo();
                           }}
                           loading={infoEditState.loading}
                         >
