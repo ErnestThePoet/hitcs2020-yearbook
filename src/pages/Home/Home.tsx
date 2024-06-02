@@ -41,6 +41,7 @@ import {
 } from "@/modules/store/reducers/session/session";
 import { coordToPoint, pointToCoord } from "@/modules/utils/map";
 import { DeleteInfoModal } from "./DeleteInfoModal/DeleteInfoModal";
+import { getStringSorter } from "@/modules/utils/sortors";
 
 const { BMapGL } = window as any;
 
@@ -135,19 +136,21 @@ const Home: React.FC = () => {
     pendingSearch.current.pending = true;
 
     setTimeout(() => {
+      let results: InfoBriefItem[] = [];
+
       if (pendingSearch.current.keyword === "") {
-        setDisplayedInfo(allInfo.current);
+        results = _.cloneDeep(allInfo.current);
       } else {
-        setDisplayedInfo(
-          allInfo.current.filter(
-            (x) =>
-              x.name.includes(pendingSearch.current.keyword) ||
-              x.studentId.includes(pendingSearch.current.keyword) ||
-              x.className.includes(pendingSearch.current.keyword) ||
-              x.city.includes(pendingSearch.current.keyword)
-          )
+        results = allInfo.current.filter(
+          (x) =>
+            x.name.includes(pendingSearch.current.keyword) ||
+            x.studentId.includes(pendingSearch.current.keyword) ||
+            x.className.includes(pendingSearch.current.keyword) ||
+            x.city.includes(pendingSearch.current.keyword)
         );
       }
+
+      setDisplayedInfo(results.sort(getStringSorter("name")));
 
       pendingSearch.current.pending = false;
     }, 100);
