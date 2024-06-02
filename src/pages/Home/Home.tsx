@@ -127,7 +127,7 @@ const Home: React.FC = () => {
   const dragMarkerRef = useRef<any>(null);
 
   const doSearch = useCallback((keyword: string) => {
-    pendingSearch.current.keyword = keyword.trim();
+    pendingSearch.current.keyword = keyword.trim().toLowerCase();
 
     if (pendingSearch.current.pending) {
       return;
@@ -143,10 +143,10 @@ const Home: React.FC = () => {
       } else {
         results = allInfo.current.filter(
           (x) =>
-            x.name.includes(pendingSearch.current.keyword) ||
-            x.studentId.includes(pendingSearch.current.keyword) ||
-            x.className.includes(pendingSearch.current.keyword) ||
-            x.city.includes(pendingSearch.current.keyword)
+            x.name.toLowerCase().includes(pendingSearch.current.keyword) ||
+            x.studentId.toLowerCase().includes(pendingSearch.current.keyword) ||
+            x.className.toLowerCase().includes(pendingSearch.current.keyword) ||
+            x.city.toLowerCase().includes(pendingSearch.current.keyword)
         );
       }
 
