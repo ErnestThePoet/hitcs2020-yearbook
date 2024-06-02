@@ -1,5 +1,4 @@
 import { Flex, Modal } from "antd";
-import { MailOutlined } from "@ant-design/icons";
 import React, { memo } from "react";
 import styles from "./AboutModal.module.scss";
 
@@ -20,18 +19,26 @@ const AboutModal: React.FC<AboutModalProps> = memo(({ open, onCancel }) => {
     >
       <Flex className={styles.flexContentWrapper} vertical>
         <div className="title">哈工大计算学部2020级同学录</div>
-        <div>
-          {"前端开发/120L021615 崔子健 "}
-          <a href="mailto: ecuiships@126.com">
-            <MailOutlined />
+        <Flex gap={5} justify="center">
+          前端开发/120L021615 崔子健
+          <a
+            href="https://github.com/ErnestThePoet/hitcs2020-yearbook"
+            target="_blank"
+          >
+            仓库
           </a>
-        </div>
-        <div>
-          {"后端开发/120L021515 张靖宇 "}
-          <a href="mailto: 1097179128@qq.com">
-            <MailOutlined />
+          <a href="mailto: ecuiships@126.com">Email</a>
+        </Flex>
+        <Flex gap={5} justify="center">
+          后端开发/120L021515 张靖宇
+          <a
+            href="https://github.com/yink12138/HITCS2020-backend"
+            target="_blank"
+          >
+            仓库
           </a>
-        </div>
+          <a href="mailto: 1097179128@qq.com">Email</a>
+        </Flex>
         <div className="time">June🦅2024</div>
         <div className="motto">“愿少年，乘风破浪，他日毋忘化雨功”</div>
         <div className="copyright">
