@@ -92,5 +92,10 @@
     div[class="name"] {
       font-weight: bold;
     }
+
+    button[class~="info"] {
+      padding: 0;
+      height: fit-content;
+    }
   }
 }

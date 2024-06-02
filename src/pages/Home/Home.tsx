@@ -266,8 +266,11 @@ const Home: React.FC = () => {
     dragMarkerRef.current = null;
   }, []);
 
-  const viewDetailedInfoOf = useCallback((point: any, id: number) => {
+  const goToLocation = useCallback((point: any) => {
     mapRef.current?.flyTo(point, 9);
+  }, []);
+
+  const viewDetailedInfo = useCallback((id: number) => {
     setModalState((value) =>
       _.merge({}, value, {
         detailedInfo: {
@@ -411,9 +414,10 @@ const Home: React.FC = () => {
                   <Flex gap={15}>
                     <Button
                       type="link"
-                      onClick={() =>
-                        viewDetailedInfoOf(coordToPoint(selfInfo.coord), userId)
-                      }
+                      onClick={() => {
+                        goToLocation(selfInfo.coord);
+                        viewDetailedInfo(userId);
+                      }}
                     >
                       查看
                     </Button>
@@ -745,15 +749,23 @@ const Home: React.FC = () => {
               }}
               renderItem={(item) => (
                 <List.Item
-                  onClick={() =>
-                    viewDetailedInfoOf(coordToPoint(item.coord), item.id)
-                  }
+                  onClick={() => goToLocation(coordToPoint(item.coord))}
                 >
-                  <Flex vertical>
+                  <Flex vertical align="flex-start">
                     <div className="name">{item.name}</div>
                     <div className="class-id-city">
                       {item.className} {item.studentId} {item.city}
                     </div>
+                    <Button
+                      className="info"
+                      type="link"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        viewDetailedInfo(item.id);
+                      }}
+                    >
+                      查看同学录信息
+                    </Button>
                   </Flex>
                 </List.Item>
               )}
