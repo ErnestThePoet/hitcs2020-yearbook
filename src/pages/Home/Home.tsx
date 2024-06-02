@@ -33,6 +33,7 @@ import {
   PoweroffOutlined,
   EditOutlined,
   QuestionCircleOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 import { ChangePwModal } from "./ChangePwModal/ChangePwModal";
@@ -429,7 +430,11 @@ const Home: React.FC = () => {
             placement="bottomRight"
             arrow={{ pointAtCenter: true }}
           >
-            <Button className={styles.btnName} type="link">
+            <Button
+              className={styles.btnName}
+              type="link"
+              icon={<UserOutlined />}
+            >
               {userName}
             </Button>
           </Dropdown>
