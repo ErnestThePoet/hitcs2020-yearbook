@@ -1,3 +1,5 @@
+@import "../../styles/common.scss";
+
 @keyframes bkg-in {
   from {
     filter: opacity(0.3);
@@ -81,8 +83,9 @@
 
 @mixin divTitleCommon($font-size) {
   font-size: $font-size;
-  font-weight: bold;
   color: #fff;
+
+  @include ma-shan-zheng-regular;
 }
 
 @media (width>700px) {
@@ -92,7 +95,7 @@
   }
 
   .divTitle {
-    @include divTitleCommon(32px);
+    @include divTitleCommon(36px);
   }
 
   .divLoginWrapper {
@@ -114,7 +117,7 @@
   }
 
   .divTitle {
-    @include divTitleCommon(24px);
+    @include divTitleCommon(28px);
   }
 
   .divLoginWrapper {
