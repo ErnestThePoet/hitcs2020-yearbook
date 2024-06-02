@@ -46,19 +46,18 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    setWindowSize({
-      w: window.innerWidth,
-      h: window.innerHeight,
-    });
-
-    window.onresize = () =>
+    const onresize = () =>
       setWindowSize({
         w: window.innerWidth,
         h: window.innerHeight,
       });
 
+    onresize();
+
+    window.addEventListener("resize", onresize);
+
     return () => {
-      window.onresize = null;
+      window.removeEventListener("resize", onresize);
     };
   }, []);
 
