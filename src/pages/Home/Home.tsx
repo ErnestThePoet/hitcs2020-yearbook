@@ -51,7 +51,8 @@ import AboutModal from "./AboutModal/AboutModal";
 const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
-const WITH_LABEL_ZOOM = 5.5;
+// Label hiding disabled
+const WITH_LABEL_ZOOM = -1;
 
 interface InfoEditFormFieldType {
   className: string;
