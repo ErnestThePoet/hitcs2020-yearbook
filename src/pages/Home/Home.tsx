@@ -251,49 +251,15 @@ const Home: React.FC = () => {
   }, []);
 
   const viewDetailedInfoOf = useCallback((point: any, id: number) => {
-    if (!mapRef.current) {
-      return;
-    }
-
-    const currentCenter = mapRef.current.getCenter();
-
-    const animation = new BMapGL.ViewAnimation(
-      [
-        {
-          // MUST make a copy of mapRef.current.getCenter()
-          center: new BMapGL.Point(currentCenter.lng, currentCenter.lat),
-          zoom: mapRef.current.getZoom(),
-          tilt: 0,
-          heading: 0,
-          percentage: 0,
+    mapRef.current?.flyTo(point, 9);
+    setModalState((value) =>
+      _.merge({}, value, {
+        detailedInfo: {
+          id,
+          open: true,
         },
-        {
-          center: point,
-          zoom: 9,
-          tilt: 0,
-          heading: 0,
-          percentage: 1,
-        },
-      ],
-      {
-        duration: 500,
-        delay: 0,
-        interation: 1,
-      }
+      })
     );
-
-    animation.addEventListener("animationend", () =>
-      setModalState((value) =>
-        _.merge({}, value, {
-          detailedInfo: {
-            id,
-            open: true,
-          },
-        })
-      )
-    );
-
-    mapRef.current.startViewAnimation(animation);
   }, []);
 
   const detailedInfoModalOnCancel = useCallback(
@@ -347,14 +313,6 @@ const Home: React.FC = () => {
     map.enableScrollWheelZoom(true);
 
     map.addControl(new BMapGL.ZoomControl());
-
-    map.updateFocusOptions({
-      open: true,
-      gray: false, // 是否使用灰度图模式
-      involve: 0, // 0 底图面线+图层 1 底图poi 2 覆盖物
-      focus: -1, // -1 全部地图使用other着色，此配置不需要商业授权；0 局部，此配置不需要商业授权
-      other: [65, 117, 250],
-    });
 
     syncSelfInfo();
     syncAllInfo();
@@ -434,7 +392,7 @@ const Home: React.FC = () => {
               {selfInfo && userId !== null && !infoEditState.editing && (
                 <>
                   <span>🌞你已经填写过同学录信息了哦</span>
-                  <Flex gap={10}>
+                  <Flex gap={15}>
                     <Button
                       type="link"
                       onClick={() =>
