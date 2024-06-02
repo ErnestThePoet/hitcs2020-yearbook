@@ -20,6 +20,8 @@
 
   filter: drop-shadow(5px 5px 5px #d2d2d2);
 
+  user-select: none;
+
   div[class="title"] {
     @include ma-shan-zheng-regular;
 
