@@ -49,11 +49,20 @@
     width: 30%;
   }
 
-  div[class~="flex-please-select-coord"] {
-    font-weight: bold;
+  div[class~="form-item-city"] {
+    margin-bottom: 6px;
+  }
 
-    button[class~="ant-btn"] {
+  div[class~="form-item-please-select-coord"] {
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: bold;
+    margin-bottom: 3px;
+
+    button[class~="btn-why-cannot-search"] {
+      display: inline;
       font-weight: bold;
+      height: fit-content;
     }
   }
 }

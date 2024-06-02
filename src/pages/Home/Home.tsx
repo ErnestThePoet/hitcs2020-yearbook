@@ -606,11 +606,9 @@ const Home: React.FC = () => {
                     </Form.Item>
 
                     <Form.Item
+                      className="form-item-city"
                       label="去向城市"
                       name="city"
-                      style={{
-                        marginBottom: 0,
-                      }}
                       rules={[
                         {
                           required: true,
@@ -636,25 +634,37 @@ const Home: React.FC = () => {
                       />
                     </Form.Item>
 
-                    <Flex
-                      className="flex-please-select-coord"
-                      align="center"
-                      wrap
+                    <Form.Item
+                      className="form-item-please-select-coord"
+                      wrapperCol={{
+                        xs: {
+                          offset: 0,
+                        },
+                        sm: {
+                          offset: 7,
+                        },
+                      }}
                     >
-                      并请在地图上选择去向地点
-                      {window.innerWidth * 0.8 < 390 && "(可关闭侧栏)"}
-                      <Popconfirm
-                        title="为何去向城市不支持地图检索"
-                        description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索，请手动选择地点坐标🥳"
-                        icon={<QuestionCircleOutlined />}
-                        okText="理解"
-                        showCancel={false}
-                      >
-                        <Button type="link" tabIndex={-1}>
-                          (为何不支持检索?)
-                        </Button>
-                      </Popconfirm>
-                    </Flex>
+                      <Flex align="center" wrap>
+                        并请拖动地图上的标记点，设置具体去向位置
+                        {window.innerWidth < 576 && "(可关闭侧栏进行此操作)"}
+                        <Popconfirm
+                          title="为何不支持地图检索设置位置"
+                          description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索。请拖动地图上的标记点，手动设置位置坐标🥳"
+                          icon={<QuestionCircleOutlined />}
+                          okText="理解"
+                          showCancel={false}
+                        >
+                          <Button
+                            className="btn-why-cannot-search"
+                            type="link"
+                            tabIndex={-1}
+                          >
+                            (为何不支持检索?)
+                          </Button>
+                        </Popconfirm>
+                      </Flex>
+                    </Form.Item>
 
                     <Form.Item label="具体去向" name="mainwork">
                       <Input
@@ -689,7 +699,7 @@ const Home: React.FC = () => {
                     <Form.Item label="毕业赠言" name="sentence">
                       <Input.TextArea
                         placeholder="(选填)"
-                        rows={5}
+                        rows={8}
                         onChange={(e) => {
                           setInfoEditState((value) =>
                             _.merge({}, value, {
