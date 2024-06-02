@@ -287,7 +287,7 @@ const Home: React.FC = () => {
   }, []);
 
   const goToLocation = useCallback((point: any) => {
-    mapRef.current?.flyTo(point, 9);
+    mapRef.current?.flyTo(point, 12);
   }, []);
 
   const viewDetailedInfo = useCallback((id: number) => {
