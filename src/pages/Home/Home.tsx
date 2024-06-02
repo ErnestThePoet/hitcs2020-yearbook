@@ -445,7 +445,7 @@ const Home: React.FC = () => {
                     <Button
                       type="link"
                       onClick={() => {
-                        goToLocation(selfInfo.coord);
+                        goToLocation(coordToPoint(selfInfo.coord));
                         viewDetailedInfo(userId);
                       }}
                     >
