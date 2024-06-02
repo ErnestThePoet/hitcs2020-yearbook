@@ -13,7 +13,7 @@
 .modal {
   width: min(90vw, 600px) !important;
 
-  [class="ant-modal-content"] {
+  div[class="ant-modal-content"] {
     background-color: #f9f6e1;
   }
 
@@ -56,13 +56,13 @@
 
   z-index: 1006;
 
-  [class="name"] {
+  div[class="name"] {
     @include ma-shan-zheng-regular;
 
     font-size: 36px;
   }
 
-  [class="location"] {
+  div[class="location"] {
     display: flex;
     align-items: center;
     line-height: 18px;
@@ -74,12 +74,12 @@
     }
   }
 
-  [class="contact"] {
+  div[class="contact"] {
     font-size: 15px;
     line-height: 22px;
   }
 
-  [class="sentence"] {
+  div[class="sentence"] {
     font-size: 15px;
     line-height: 22px;
 

@@ -738,7 +738,7 @@ const Home: React.FC = () => {
               className={styles.listSearchResult}
               header={
                 <Input
-                  placeholder="同学录检索"
+                  placeholder="搜索同学录..."
                   allowClear
                   value={searchKeyword}
                   onChange={(e) => {

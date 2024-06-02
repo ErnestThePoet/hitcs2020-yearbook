@@ -115,7 +115,7 @@ const Login: React.FC = () => {
               }
             );
           }}
-          labelCol={{ span: 5 }}
+          labelCol={{ span: 4 }}
         >
           <Form.Item<LoginFormFieldType>
             label="账号"
@@ -148,13 +148,13 @@ const Login: React.FC = () => {
           <Form.Item<LoginFormFieldType>
             name="remember"
             valuePropName="checked"
-            wrapperCol={{ offset: windowSize.w > 575 ? 5 : 0 }}
+            wrapperCol={{ offset: windowSize.w > 575 ? 4 : 0 }}
           >
             <Checkbox>7日内自动登录</Checkbox>
           </Form.Item>
 
           <Form.Item
-            wrapperCol={{ offset: windowSize.w > 575 ? 5 : 0 }}
+            wrapperCol={{ offset: windowSize.w > 575 ? 4 : 0 }}
             validateStatus={loginError ? "error" : "success"}
             help={loginErrorMessage}
           >

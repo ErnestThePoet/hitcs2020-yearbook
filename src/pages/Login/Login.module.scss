@@ -80,7 +80,7 @@
 }
 
 @mixin formLoginCommon {
-  width: min(500px, 90vw);
+  width: min(475px, 90vw);
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 15px;
 
@@ -90,16 +90,8 @@
   animation-duration: 1000ms;
   animation-timing-function: ease-in-out;
 
-  [class~="btn-login"] {
+  button[class~="btn-login"] {
     width: 100%;
-  }
-
-  div[class~="ant-form-item-label"] {
-    flex: unset !important;
-  }
-
-  div[class~="ant-form-item-control"] {
-    flex: 1 1 0 !important;
   }
 }
 
