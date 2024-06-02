@@ -29,7 +29,7 @@ export function getStringSorter<T>(key: keyof T | string[]) {
   return (a: T, b: T) =>
     stringCompare(
       (a[key] as Maybe<string>) ?? "",
-      (b[key] as Maybe<string>) ?? "",
+      (b[key] as Maybe<string>) ?? ""
     );
 }
 
