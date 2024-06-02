@@ -235,6 +235,22 @@ const Home: React.FC = () => {
       enableDragging: true,
     });
 
+    const dragMarkerLabel = new BMapGL.Label("请设置位置", {
+      offset: new BMapGL.Size(15, -22),
+    });
+    dragMarkerLabel.setStyle({
+      backgroundColor: "#fef6d5",
+      color: "#ea6500",
+      borderRadius: "10px",
+      borderColor: "#ccc",
+      padding: "0 5px",
+      fontSize: "12px",
+      lineHeight: "20px",
+      cursor: "pointer",
+    });
+
+    dragMarker.setLabel(dragMarkerLabel);
+
     mapRef.current.addOverlay(dragMarker);
 
     dragMarkerRef.current = dragMarker;
