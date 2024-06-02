@@ -65,9 +65,6 @@ const Login: React.FC = () => {
   return (
     <main className={styles.main}>
       <title>登录 - 哈工大计算学部2020级同学录</title>
-      <Flex className={styles.flexLogoRowWrapper} align="center">
-        <div className={styles.divTitle}>哈工大计算学部2020级同学录</div>
-      </Flex>
       <div
         className={classNames(
           styles.divLoginWrapper,
@@ -76,6 +73,9 @@ const Login: React.FC = () => {
             : styles.divLoginWrapperBkgV
         )}
       >
+        <Flex className={styles.flexTitleRowWrapper} align="center">
+          <div className={styles.divTitle}>哈工大计算学部2020级同学录</div>
+        </Flex>
         <Form
           className={styles.formLogin}
           initialValues={{ remember: true }}

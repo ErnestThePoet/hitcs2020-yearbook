@@ -2,18 +2,30 @@
 
 @keyframes bkg-in {
   from {
-    filter: opacity(0.3);
+    filter: opacity(0.3) blur(2px);
+  }
+
+  to {
+    filter: opacity(1) blur(0);
+  }
+}
+
+@keyframes title-row-in {
+  from {
+    filter: opacity(0);
+    transform: translateY(-50%);
   }
 
   to {
     filter: opacity(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes form-login-in {
   from {
-    filter: opacity(0.3);
-    transform: translateY(-5%);
+    filter: opacity(0);
+    transform: translateY(5%);
   }
 
   to {
@@ -27,7 +39,7 @@
   height: 100vh;
 }
 
-@mixin flexLogoRowWrapperCommon {
+@mixin flexTitleRowWrapperCommon {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,6 +51,10 @@
     rgba(0, 0, 0, 0.5) 0%,
     rgba(0, 0, 0, 0.08) 100%
   );
+  
+  animation-name: title-row-in;
+  animation-duration: 1000ms;
+  animation-timing-function: ease-in-out;
 }
 
 @mixin divLoginWrapperCommon {
@@ -49,7 +65,7 @@
   align-items: center;
 
   animation-name: bkg-in;
-  animation-duration: 1000ms;
+  animation-duration: 1500ms;
   animation-timing-function: ease-in-out;
 }
 
@@ -64,8 +80,6 @@
 }
 
 @mixin formLoginCommon {
-  padding: 50px;
-  padding-bottom: 20px;
   width: min(500px, 90vw);
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 15px;
@@ -79,6 +93,14 @@
   [class~="btn-login"] {
     width: 100%;
   }
+
+  div[class~="ant-form-item-label"] {
+    flex: unset !important;
+  }
+
+  div[class~="ant-form-item-control"] {
+    flex: 1 1 0 !important;
+  }
 }
 
 @mixin divTitleCommon($font-size) {
@@ -89,8 +111,8 @@
 }
 
 @media (width>700px) {
-  .flexLogoRowWrapper {
-    @include flexLogoRowWrapperCommon;
+  .flexTitleRowWrapper {
+    @include flexTitleRowWrapperCommon;
     padding: 0 100px 0 30px;
   }
 
@@ -105,13 +127,15 @@
 
   .formLogin {
     @include formLoginCommon;
+    padding: 50px;
+    padding-bottom: 20px;
     margin-right: 100px;
   }
 }
 
 @media (width<=700px) {
-  .flexLogoRowWrapper {
-    @include flexLogoRowWrapperCommon;
+  .flexTitleRowWrapper {
+    @include flexTitleRowWrapperCommon;
     padding: 0;
     justify-content: center;
   }
@@ -127,6 +151,12 @@
 
   .formLogin {
     @include formLoginCommon;
+    padding: 30px;
+    padding-bottom: 20px;
+
+    div[class~="ant-form-item"] {
+      margin-bottom: 12px;
+    }
   }
 }
 
