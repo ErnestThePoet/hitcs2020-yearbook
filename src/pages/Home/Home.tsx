@@ -427,6 +427,10 @@ const Home: React.FC = () => {
 
     syncSelfInfo();
     syncAllInfo();
+
+    const refetchIntervalId = setInterval(syncAllInfo, 30 * 1000);
+
+    return () => clearInterval(refetchIntervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn]);
 
