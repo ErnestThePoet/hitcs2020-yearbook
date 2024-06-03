@@ -471,9 +471,9 @@ const Home: React.FC = () => {
     syncAllInfo();
 
     const refetchIntervalId = setInterval(() => {
-      detailedInfoCache.clearExcept([userId!]);
+      syncSelfInfo();
       syncAllInfo();
-    }, 60 * 1000);
+    }, 5 * 1000);
 
     return () => clearInterval(refetchIntervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -667,6 +667,8 @@ const Home: React.FC = () => {
                       type="link"
                       icon={<EditOutlined />}
                       onClick={() => {
+                        goToLocation(POINT_BEIJING, INITIAL_ZOOM, 3);
+
                         setInfoEditState((value) => ({
                           ...value,
                           editing: true,
@@ -753,11 +755,11 @@ const Home: React.FC = () => {
                       rules={[
                         {
                           required: true,
-                          message: "请填写大学班级",
+                          message: "请选择大学班级",
                         },
                         {
                           whitespace: true,
-                          message: "请填写大学班级",
+                          message: "请选择大学班级",
                         },
                       ]}
                     >

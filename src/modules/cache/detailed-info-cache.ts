@@ -22,18 +22,6 @@ class DetailedInfoCache {
   delete(id: number) {
     this.cache.delete(id);
   }
-
-  clearExcept(ids: number[]) {
-    const newCache: typeof this.cache = new Map();
-
-    for (const id of ids) {
-      if (this.cache.has(id)) {
-        newCache.set(id, this.cache.get(id)!);
-      }
-    }
-
-    this.cache = newCache;
-  }
 }
 
 export default new DetailedInfoCache();
