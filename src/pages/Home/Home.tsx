@@ -473,7 +473,7 @@ const Home: React.FC = () => {
     const refetchIntervalId = setInterval(() => {
       syncSelfInfo();
       syncAllInfo();
-    }, 5 * 1000);
+    }, 60 * 1000);
 
     return () => clearInterval(refetchIntervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -707,14 +707,9 @@ const Home: React.FC = () => {
                         coord: pointToCoord(
                           dragMarkerRef.current.getPosition()
                         ),
-                        contact:
-                          e.contact.trim() === "" ? null : e.contact.trim(),
-                        mainwork:
-                          e.mainwork.trim() === "" ? null : e.mainwork.trim(),
-                        sentence:
-                          e.sentence.trimEnd() === ""
-                            ? null
-                            : e.sentence.trimEnd(),
+                        contact: e.contact.trim() || null,
+                        mainwork: e.mainwork.trim() || null,
+                        sentence: e.sentence.trimEnd() || null,
                       };
 
                       handleRequest(
