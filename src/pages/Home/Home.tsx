@@ -351,7 +351,8 @@ const Home: React.FC = () => {
   }, []);
 
   const goToLocation = useCallback((point: any) => {
-    mapRef.current?.flyTo(point, 12);
+    // Set center a little bit to south so bottom drawer won't shadow the point
+    mapRef.current?.flyTo(new BMapGL.Point(point.lng, point.lat - 0.05), 12);
   }, []);
 
   const viewDetailedInfo = useCallback((id: number) => {
