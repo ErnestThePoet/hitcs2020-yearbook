@@ -12,7 +12,7 @@ interface SendWordsModalProps {
 const SendWordsModal: React.FC<SendWordsModalProps> = memo(
   ({ open, onCancel }) => {
     return (
-      <FlowerModal open={open} onCancel={onCancel}>
+      <FlowerModal centered open={open} onCancel={onCancel}>
         <div className={styles.divSendWordsWrapper}>
           {sendWords.length ? (
             <Collapse

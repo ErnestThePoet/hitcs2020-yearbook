@@ -55,7 +55,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
     }, [open, id]);
 
     return (
-      <FlowerModal open={open} onCancel={onCancel}>
+      <FlowerModal centered open={open} onCancel={onCancel}>
         {detailedInfo ? (
           <Flex className={styles.flexInfoWrapper} vertical gap={8}>
             {loading ? (

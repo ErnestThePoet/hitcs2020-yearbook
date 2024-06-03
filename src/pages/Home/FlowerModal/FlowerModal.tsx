@@ -1,26 +1,16 @@
-import { Modal } from "antd";
+import { Modal, ModalProps } from "antd";
 import React, { memo } from "react";
 import "./FlowerModal.scss";
 import classNames from "classnames";
 
-interface FlowerModalProps {
-  className?: string;
-  rootClassName?: string;
-  open: boolean;
-  onCancel: () => void;
-  children?: React.ReactNode;
-}
-
-const FlowerModal: React.FC<FlowerModalProps> = memo(
-  ({ className, rootClassName, open, onCancel, children }) => {
+const FlowerModal: React.FC<ModalProps> = memo(
+  ({ className, rootClassName, children, ...restProps }) => {
     return (
       <Modal
         className={classNames("flower-modal", className)}
         rootClassName={classNames("flower-modal-root", rootClassName)}
-        centered
-        open={open}
         footer={null}
-        onCancel={onCancel}
+        {...restProps}
       >
         <div className="flower-modal-flower-wrapper">
           <img
