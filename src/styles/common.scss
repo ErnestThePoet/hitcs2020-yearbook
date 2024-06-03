@@ -39,3 +39,7 @@
     background-color: $track;
   }
 }
+
+@mixin orange-scroll-bar {
+  @include colored-scroll-bar(#ffecc5, #ffecc5, #ffeecc, #f9f6e1);
+}
