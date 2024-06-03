@@ -61,8 +61,8 @@ import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
-// Label hiding disabled
-const WITH_LABEL_ZOOM = -1;
+// Set to <=0 to disable
+const WITH_LABEL_ZOOM = 5.7;
 
 interface InfoEditFormFieldType {
   className: string;
@@ -469,7 +469,7 @@ const Home: React.FC = () => {
   return (
     <main className={styles.main}>
       <audio autoPlay loop ref={bgmAudio}>
-        <source src="bgm.mp3" />
+        <source src="/bgm.mp3" />
       </audio>
 
       <div id="div-map-wrapper" className={styles.divMapWrapper} />
@@ -536,7 +536,7 @@ const Home: React.FC = () => {
         open={drawerOpen}
         mask={false}
         width="min(390px, 80vw)"
-        height="min(400px, 45vh)"
+        height="min(400px, 55vh)"
         extra={
           <Dropdown
             menu={{
