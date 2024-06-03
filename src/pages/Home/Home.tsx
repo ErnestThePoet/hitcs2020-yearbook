@@ -55,6 +55,7 @@ import Pinyin from "pinyin-match";
 import Music from "@/assets/icons/music";
 import Mute from "@/assets/icons/mute";
 import SendWordsModal from "./SendWordsModal/SendWordsModal";
+import { useWindowSize } from "@/modules/hooks/use-window-size";
 
 const { BMapGL } = window as any;
 
@@ -72,6 +73,8 @@ interface InfoEditFormFieldType {
 
 const Home: React.FC = () => {
   const loggedIn = useLogin();
+
+  const windowSize = useWindowSize();
 
   const navigate = useNavigate();
 
@@ -462,69 +465,69 @@ const Home: React.FC = () => {
 
       <div id="div-map-wrapper" className={styles.divMapWrapper} />
 
-      {!drawerOpen && (
-        <Flex
-          className={styles.flexFloatingButtonsWrapper}
-          vertical
-          gap={10}
-          align="center"
-        >
-          <Button
-            icon={<MenuOutlined />}
-            shape="circle"
-            size="large"
-            onClick={() => setDrawerOpen(true)}
-          />
+      <Flex
+        className={styles.flexFloatingButtonsWrapper}
+        vertical
+        gap={10}
+        align="center"
+      >
+        <Button
+          icon={<MenuOutlined />}
+          shape="circle"
+          size="large"
+          onClick={() => setDrawerOpen((open) => !open)}
+        />
 
-          <Button
-            icon={
-              bgmPlaying ? (
-                <Icon
-                  // Use style to prevent hashing animation name in scss
-                  style={{
-                    animation: "loadingCircle 5s infinite linear",
-                  }}
-                  component={Music}
-                />
-              ) : (
-                <Icon component={Mute} />
-              )
-            }
-            shape="circle"
-            size="large"
-            onClick={toggleBgmPlay}
-          />
+        <Button
+          icon={
+            bgmPlaying ? (
+              <Icon
+                // Use style to prevent hashing animation name in scss
+                style={{
+                  animation: "loadingCircle 5s infinite linear",
+                }}
+                component={Music}
+              />
+            ) : (
+              <Icon component={Mute} />
+            )
+          }
+          shape="circle"
+          size="large"
+          onClick={toggleBgmPlay}
+        />
 
-          <Button
-            icon={<HeartOutlined />}
-            shape="circle"
-            size="large"
-            onClick={() =>
-              setModalState((value) =>
-                _.merge({}, value, { sendWords: { open: true } })
-              )
-            }
-          />
+        <Button
+          icon={<HeartOutlined />}
+          shape="circle"
+          size="large"
+          onClick={() =>
+            setModalState((value) =>
+              _.merge({}, value, { sendWords: { open: true } })
+            )
+          }
+        />
 
-          <Button
-            icon={<InfoOutlined />}
-            shape="circle"
-            size="large"
-            onClick={() =>
-              setModalState((value) =>
-                _.merge({}, value, { about: { open: true } })
-              )
-            }
-          />
-        </Flex>
-      )}
+        <Button
+          icon={<InfoOutlined />}
+          shape="circle"
+          size="large"
+          onClick={() =>
+            setModalState((value) =>
+              _.merge({}, value, { about: { open: true } })
+            )
+          }
+        />
+      </Flex>
 
       <Drawer
         title="操作中心"
         onClose={() => setDrawerOpen(false)}
+        placement={windowSize.w > windowSize.h ? "right" : "bottom"}
         open={drawerOpen}
         mask={false}
         width="min(390px, 80vw)"
+        height="min(400px, 45vh)"
         extra={
           <Dropdown
             menu={{
@@ -798,7 +801,6 @@ const Home: React.FC = () => {
                     >
                       <Flex align="center" wrap>
                         并请拖动地图上的标记点，设置具体去向位置
-                        {window.innerWidth < 576 && "(可关闭侧栏进行此操作)"}
                         <Popconfirm
                           title="为何不支持地图检索设置位置"
                           description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索。请拖动地图上的标记点，手动设置位置坐标🥳"

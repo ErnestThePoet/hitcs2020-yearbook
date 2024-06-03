@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Checkbox, Flex, Form, Input } from "antd";
 import styles from "./Login.module.scss";
 import { REQ, handleRequest } from "@/modules/api/api";
@@ -15,6 +15,7 @@ import {
   USER_PASSWORD_HINT,
   USER_PASSWORD_PATTERN,
 } from "@/modules/rules/user-rules";
+import { useWindowSize } from "@/modules/hooks/use-window-size";
 
 interface LoginFormFieldType {
   userName: string;
@@ -27,15 +28,9 @@ const Login: React.FC = () => {
 
   useLogin(({ navigate }) => navigate("/", { replace: true }));
 
-  const dispatch = useAppDispatch();
+  const windowSize = useWindowSize();
 
-  const [windowSize, setWindowSize] = useState<{
-    w: number;
-    h: number;
-  }>({
-    w: 1,
-    h: 1,
-  });
+  const dispatch = useAppDispatch();
 
   const [{ loginError, loginErrorMessage }, setLoginErrorData] = useState<{
     loginError: boolean;
@@ -44,22 +39,6 @@ const Login: React.FC = () => {
     loginError: false,
     loginErrorMessage: "",
   });
-
-  useEffect(() => {
-    const onresize = () =>
-      setWindowSize({
-        w: window.innerWidth,
-        h: window.innerHeight,
-      });
-
-    onresize();
-
-    window.addEventListener("resize", onresize);
-
-    return () => {
-      window.removeEventListener("resize", onresize);
-    };
-  }, []);
 
   return (
     <main className={styles.main}>
