@@ -62,7 +62,7 @@ const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
 // Set to <=0 to disable
-const DETAILED_ZOOM_THRESHOLD = 5.7;
+const DETAILED_ZOOM_THRESHOLD = 5.8;
 
 interface InfoEditFormFieldType {
   className: string;
@@ -238,18 +238,16 @@ const Home: React.FC = () => {
           })
         );
 
-      const marker = new BMapGL.Marker(
-        coordToPoint(info.coord),
-        detailed
-          ? undefined
-          : {
-              icon: new BMapGL.Icon("/star.svg", new BMapGL.Size(10, 10)),
-            }
-      );
+      const marker = new BMapGL.Marker(coordToPoint(info.coord), {
+        icon: new BMapGL.Icon(
+          "/star.svg",
+          detailed ? new BMapGL.Size(18, 18) : new BMapGL.Size(10, 10)
+        ),
+      });
 
       if (detailed) {
         const label = new BMapGL.Label(info.name, {
-          offset: new BMapGL.Size(15, -22),
+          offset: new BMapGL.Size(13, -11),
         });
         label.setStyle({
           backgroundColor: "#fef6d5",
