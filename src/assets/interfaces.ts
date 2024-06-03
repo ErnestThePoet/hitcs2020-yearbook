@@ -10,6 +10,5 @@ export interface ClassListItem {
 
 export interface SendWordItem {
   name: string;
-  type: "FDY" | "TEACHER" | "CELEBRITY";
   word: string;
 }
