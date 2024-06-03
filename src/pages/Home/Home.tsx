@@ -352,14 +352,18 @@ const Home: React.FC = () => {
   }, []);
 
   const goToLocation = useCallback(
-    (point: any, zoom: number = 12, latOffset = 0.05) => {
+    (point: any, zoom: number = 12, verticalScreenLatOffset = 0.05) => {
       // Set center a little bit to south so bottom drawer won't shadow the point
       mapRef.current?.flyTo(
-        new BMapGL.Point(point.lng, point.lat - latOffset),
+        new BMapGL.Point(
+          point.lng,
+          point.lat -
+            (windowSize.h > windowSize.w ? verticalScreenLatOffset : 0)
+        ),
         zoom
       );
     },
-    []
+    [windowSize.h, windowSize.w]
   );
 
   const viewDetailedInfo = useCallback((id: number) => {
