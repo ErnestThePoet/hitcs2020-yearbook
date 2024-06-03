@@ -62,7 +62,7 @@ const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
 // Set to <=0 to disable
-const WITH_LABEL_ZOOM = 5.7;
+const DETAILED_ZOOM_THRESHOLD = 5.7;
 
 interface InfoEditFormFieldType {
   className: string;
@@ -221,7 +221,7 @@ const Home: React.FC = () => {
     }, 100);
   }, []);
 
-  const drawAllInfo = useCallback((withLabel: boolean) => {
+  const drawAllInfo = useCallback((detailed: boolean) => {
     if (!mapRef.current) {
       return;
     }
@@ -238,9 +238,16 @@ const Home: React.FC = () => {
           })
         );
 
-      const marker = new BMapGL.Marker(coordToPoint(info.coord));
+      const marker = new BMapGL.Marker(
+        coordToPoint(info.coord),
+        detailed
+          ? undefined
+          : {
+              icon: new BMapGL.Icon("/star.svg", new BMapGL.Size(10, 10)),
+            }
+      );
 
-      if (withLabel) {
+      if (detailed) {
         const label = new BMapGL.Label(info.name, {
           offset: new BMapGL.Size(15, -22),
         });
@@ -273,7 +280,7 @@ const Home: React.FC = () => {
 
         if (mapRef.current && !infoEditingRef.current) {
           mapRef.current.clearOverlays();
-          drawAllInfo(mapRef.current.getZoom() > WITH_LABEL_ZOOM);
+          drawAllInfo(mapRef.current.getZoom() > DETAILED_ZOOM_THRESHOLD);
         }
       },
     });
@@ -436,14 +443,14 @@ const Home: React.FC = () => {
       }
 
       if (
-        mapZoomStartZoom.current <= WITH_LABEL_ZOOM &&
-        map.getZoom() > WITH_LABEL_ZOOM
+        mapZoomStartZoom.current <= DETAILED_ZOOM_THRESHOLD &&
+        map.getZoom() > DETAILED_ZOOM_THRESHOLD
       ) {
         map.clearOverlays();
         drawAllInfo(true);
       } else if (
-        mapZoomStartZoom.current > WITH_LABEL_ZOOM &&
-        map.getZoom() <= WITH_LABEL_ZOOM
+        mapZoomStartZoom.current > DETAILED_ZOOM_THRESHOLD &&
+        map.getZoom() <= DETAILED_ZOOM_THRESHOLD
       ) {
         map.clearOverlays();
         drawAllInfo(false);
@@ -883,7 +890,8 @@ const Home: React.FC = () => {
 
                             if (mapRef.current) {
                               drawAllInfo(
-                                mapRef.current.getZoom() > WITH_LABEL_ZOOM
+                                mapRef.current.getZoom() >
+                                  DETAILED_ZOOM_THRESHOLD
                               );
                             }
 
