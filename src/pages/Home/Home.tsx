@@ -541,7 +541,7 @@ const Home: React.FC = () => {
         open={drawerOpen}
         mask={false}
         width="min(390px, 80vw)"
-        height="min(400px, 55vh)"
+        height="min(450px, 55vh)"
         extra={
           <Dropdown
             menu={{
