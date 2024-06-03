@@ -78,9 +78,13 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                 <div className="class-id">
                   <Tooltip
                     color="orange"
-                    title={getClassDesc(
-                      classIdItemMap.get(detailedInfo.className)!
-                    )}
+                    title={
+                      classIdItemMap.has(detailedInfo.className)
+                        ? getClassDesc(
+                            classIdItemMap.get(detailedInfo.className)!
+                          )
+                        : "无班级信息"
+                    }
                   >
                     <span className="class-name">
                       {detailedInfo.className}班
