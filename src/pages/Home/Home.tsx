@@ -460,7 +460,6 @@ const Home: React.FC = () => {
             icon={
               bgmPlaying ? (
                 <Icon
-                  className="icon-sound-mute"
                   // Use style to prevent hashing animation name in scss
                   style={{
                     animation: "loadingCircle 5s infinite linear",
@@ -468,7 +467,7 @@ const Home: React.FC = () => {
                   component={Music}
                 />
               ) : (
-                <Icon className="icon-sound-mute" component={Mute} />
+                <Icon component={Mute} />
               )
             }
             shape="circle"
