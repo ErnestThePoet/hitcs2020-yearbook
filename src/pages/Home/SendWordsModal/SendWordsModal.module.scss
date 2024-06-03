@@ -29,6 +29,8 @@
   }
 
   div[class="send-word"] {
+    @include noto-serif-sc;
+
     font-size: 16px;
     line-height: 24px;
   }
