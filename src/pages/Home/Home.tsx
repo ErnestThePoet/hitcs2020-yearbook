@@ -61,6 +61,7 @@ import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 const { BMapGL } = window as any;
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
+const INITIAL_ZOOM = 6;
 // Set to <=0 to disable
 const DETAILED_ZOOM_THRESHOLD = 5.8;
 
@@ -350,10 +351,16 @@ const Home: React.FC = () => {
     infoEditingRef.current = false;
   }, []);
 
-  const goToLocation = useCallback((point: any) => {
-    // Set center a little bit to south so bottom drawer won't shadow the point
-    mapRef.current?.flyTo(new BMapGL.Point(point.lng, point.lat - 0.05), 12);
-  }, []);
+  const goToLocation = useCallback(
+    (point: any, zoom: number = 12, latOffset = 0.05) => {
+      // Set center a little bit to south so bottom drawer won't shadow the point
+      mapRef.current?.flyTo(
+        new BMapGL.Point(point.lng, point.lat - latOffset),
+        zoom
+      );
+    },
+    []
+  );
 
   const viewDetailedInfo = useCallback((id: number) => {
     setModalState((value) =>
@@ -427,7 +434,7 @@ const Home: React.FC = () => {
 
     mapRef.current = map;
 
-    map.centerAndZoom(POINT_BEIJING, 6);
+    map.centerAndZoom(POINT_BEIJING, INITIAL_ZOOM);
     map.enableScrollWheelZoom(true);
 
     map.addControl(new BMapGL.ZoomControl());
@@ -608,6 +615,8 @@ const Home: React.FC = () => {
                       type="link"
                       onClick={() => {
                         const selfPoint = coordToPoint(selfInfo.coord);
+
+                        goToLocation(selfPoint, INITIAL_ZOOM, 3);
 
                         setInfoEditState((value) => ({
                           ...value,
