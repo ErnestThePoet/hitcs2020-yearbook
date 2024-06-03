@@ -88,13 +88,13 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                   {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
                 </div>
                 {detailedInfo.contact && (
-                  <Flex vertical gap={5}>
+                  <Flex vertical>
                     <div>联系方式：</div>
                     <div className="contact">{detailedInfo.contact}</div>
                   </Flex>
                 )}
                 {detailedInfo.sentence && (
-                  <Flex vertical gap={5}>
+                  <Flex vertical>
                     <div>毕业赠言：</div>
                     <div className="sentence">{detailedInfo.sentence}</div>
                   </Flex>

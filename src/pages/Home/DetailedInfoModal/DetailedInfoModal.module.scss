@@ -31,7 +31,11 @@
   div[class="location"] {
     display: flex;
     align-items: center;
-    line-height: 18px;
+    line-height: 20px;
+
+    // When location is the bottom row, this
+    // prevents parent flex to have scroll bar
+    padding-block: 3px;
 
     img[class="img-location"] {
       width: 1.3em;
