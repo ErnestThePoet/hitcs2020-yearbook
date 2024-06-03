@@ -24,6 +24,7 @@ import {
   List,
   Popconfirm,
   Select,
+  Tag,
   message,
 } from "antd";
 import Icon, {
@@ -603,7 +604,7 @@ const Home: React.FC = () => {
             <Flex vertical gap={5} align="center">
               {selfInfo && userId !== null && !infoEditState.editing && (
                 <>
-                  <span>🌞你已经填写过同学录信息了哦</span>
+                  <Tag color="green">🌞你已经填写过同学录信息了哦</Tag>
                   <Flex gap={15}>
                     <Button
                       type="link"
@@ -660,7 +661,7 @@ const Home: React.FC = () => {
               )}
               {!selfInfo && !infoEditState.editing && (
                 <>
-                  <span>✨你还没有填写同学录信息哦</span>
+                  <Tag color="orange">✨你还没有填写同学录信息哦</Tag>
                   <Flex gap={10}>
                     <Button
                       type="link"
