@@ -1,5 +1,21 @@
 @import "../../../styles/common.scss";
 
+.modal {
+  div[class~="ant-modal-header"] {
+    background-color: transparent;
+
+    div[class~="ant-modal-title"] {
+      text-align: center;
+      font-size: 20px;
+      @include ma-shan-zheng-regular;
+    }
+  }
+
+  div[class~="flower-modal-content-wrapper"] {
+    padding-top: 10px;
+  }
+}
+
 .divSendWordsWrapper {
   max-height: 70vh;
   overflow-y: auto;
@@ -24,8 +40,8 @@
   div[class="name"] {
     @include ma-shan-zheng-regular;
 
-    font-size: 22px;
-    line-height: 26px;
+    font-size: 20px;
+    line-height: 24px;
   }
 
   div[class="send-word"] {
