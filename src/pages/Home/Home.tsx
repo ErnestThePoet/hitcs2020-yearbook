@@ -712,7 +712,9 @@ const Home: React.FC = () => {
                         mainwork:
                           e.mainwork.trim() === "" ? null : e.mainwork.trim(),
                         sentence:
-                          e.sentence.trim() === "" ? null : e.sentence.trim(),
+                          e.sentence.trimEnd() === ""
+                            ? null
+                            : e.sentence.trimEnd(),
                       };
 
                       handleRequest(
