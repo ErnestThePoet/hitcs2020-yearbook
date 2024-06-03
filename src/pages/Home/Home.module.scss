@@ -26,6 +26,10 @@
       border-color: #d9d9d9 !important;
     }
   }
+
+  span[class~="icon-sound-mute"] {
+    width: 1em;
+  }
 }
 
 .btnName {

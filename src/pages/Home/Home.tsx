@@ -26,10 +26,8 @@ import {
   Select,
   message,
 } from "antd";
-import {
+import Icon, {
   MenuOutlined,
-  SoundOutlined,
-  MutedOutlined,
   LockOutlined,
   PoweroffOutlined,
   EditOutlined,
@@ -53,6 +51,8 @@ import { ClassListItem } from "@/assets/interfaces";
 import { getClassDesc, getClassSearchList } from "@/modules/utils/class-util";
 import { classIdItemMap } from "@/assets/class-list";
 import Pinyin from "pinyin-match";
+import Music from "@/assets/icons/music";
+import Mute from "@/assets/icons/mute";
 
 const { BMapGL } = window as any;
 
@@ -457,7 +457,20 @@ const Home: React.FC = () => {
           />
 
           <Button
-            icon={bgmPlaying ? <SoundOutlined /> : <MutedOutlined />}
+            icon={
+              bgmPlaying ? (
+                <Icon
+                  className="icon-sound-mute"
+                  // Use style to prevent hashing animation name in scss
+                  style={{
+                    animation: "loadingCircle 5s infinite linear",
+                  }}
+                  component={Music}
+                />
+              ) : (
+                <Icon className="icon-sound-mute" component={Mute} />
+              )
+            }
             shape="circle"
             size="large"
             onClick={toggleBgmPlay}
