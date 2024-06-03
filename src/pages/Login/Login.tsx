@@ -45,17 +45,25 @@ const Login: React.FC = () => {
       <title>登录 - 哈工大计算学部2020级同学录</title>
       <div
         className={classNames(
-          styles.divLoginWrapper,
-          windowSize.w > windowSize.h
-            ? styles.divLoginWrapperBkgH
-            : styles.divLoginWrapperBkgV
+          windowSize.vertical
+            ? [styles.divLoginWrapperV, styles.divLoginWrapperBkgV]
+            : [styles.divLoginWrapperH, styles.divLoginWrapperBkgH]
         )}
       >
-        <Flex className={styles.flexTitleRowWrapper} align="center">
+        <Flex
+          className={
+            windowSize.vertical
+              ? styles.flexTitleRowWrapperV
+              : styles.flexTitleRowWrapperH
+          }
+          align="center"
+        >
           <div className={styles.divTitle}>哈工大计算学部2020级同学录</div>
         </Flex>
         <Form
-          className={styles.formLogin}
+          className={classNames(styles.formLogin, {
+            [styles.formLoginH]: !windowSize.vertical,
+          })}
           initialValues={{ remember: true }}
           onFinish={(e) => {
             handleRequest(

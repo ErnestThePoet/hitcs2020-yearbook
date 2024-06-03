@@ -84,6 +84,8 @@
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 15px;
 
+  padding-bottom: 20px;
+
   box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.5);
 
   animation-name: form-login-in;
@@ -111,53 +113,54 @@
 }
 
 @media (width>700px) {
-  .flexTitleRowWrapper {
-    @include flexTitleRowWrapperCommon;
-    padding: 0 100px 0 30px;
-  }
-
   .divTitle {
     @include divTitleCommon(36px);
-  }
-
-  .divLoginWrapper {
-    @include divLoginWrapperCommon;
-    justify-content: flex-end;
   }
 
   .formLogin {
     @include formLoginCommon;
     padding: 50px;
-    padding-bottom: 20px;
-    margin-right: 100px;
   }
 }
 
 @media (width<=700px) {
-  .flexTitleRowWrapper {
-    @include flexTitleRowWrapperCommon;
-    padding: 0;
-    justify-content: center;
-  }
-
   .divTitle {
     @include divTitleCommon(28px);
-  }
-
-  .divLoginWrapper {
-    @include divLoginWrapperCommon;
-    justify-content: center;
   }
 
   .formLogin {
     @include formLoginCommon;
     padding: 30px;
-    padding-bottom: 20px;
 
     div[class~="ant-form-item"] {
       margin-bottom: 12px;
     }
   }
+}
+
+.flexTitleRowWrapperH {
+  @include flexTitleRowWrapperCommon;
+  padding: 0 100px 0 30px;
+}
+
+.flexTitleRowWrapperV {
+  @include flexTitleRowWrapperCommon;
+  padding: 0;
+  justify-content: center;
+}
+
+.divLoginWrapperH {
+  @include divLoginWrapperCommon;
+  justify-content: flex-end;
+}
+
+.divLoginWrapperV {
+  @include divLoginWrapperCommon;
+  justify-content: center;
+}
+
+.formLoginH {
+  margin-right: 100px;
 }
 
 .divLoginWrapperBkgH {

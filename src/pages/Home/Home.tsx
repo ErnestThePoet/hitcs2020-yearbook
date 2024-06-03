@@ -357,13 +357,12 @@ const Home: React.FC = () => {
       mapRef.current?.flyTo(
         new BMapGL.Point(
           point.lng,
-          point.lat -
-            (windowSize.h > windowSize.w ? verticalScreenLatOffset : 0)
+          point.lat - (windowSize.vertical ? verticalScreenLatOffset : 0)
         ),
         zoom
       );
     },
-    [windowSize.h, windowSize.w]
+    [windowSize.vertical]
   );
 
   const viewDetailedInfo = useCallback((id: number) => {
@@ -549,7 +548,7 @@ const Home: React.FC = () => {
       <Drawer
         title="操作中心"
         onClose={() => setDrawerOpen(false)}
-        placement={windowSize.w > windowSize.h ? "right" : "bottom"}
+        placement={windowSize.vertical ? "bottom" : "right"}
         open={drawerOpen}
         mask={false}
         width="min(390px, 80vw)"
