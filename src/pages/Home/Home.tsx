@@ -23,6 +23,7 @@ import {
   Input,
   List,
   Popconfirm,
+  Select,
   message,
 } from "antd";
 import {
@@ -47,6 +48,10 @@ import { coordToPoint, pointToCoord } from "@/modules/utils/map";
 import { DeleteInfoModal } from "./DeleteInfoModal/DeleteInfoModal";
 import { getStringSorter } from "@/modules/utils/sortors";
 import AboutModal from "./AboutModal/AboutModal";
+import classList from "@/assets/class-list.json";
+import { ClassListItem } from "@/assets/interfaces";
+import { getClassDesc, getClassSearchList } from "@/modules/utils/class-util";
+import { classIdItemMap } from "@/assets/class-list";
 
 const { BMapGL } = window as any;
 
@@ -169,18 +174,31 @@ const Home: React.FC = () => {
     pendingSearch.current.pending = true;
 
     setTimeout(() => {
+      const searchKeyword = pendingSearch.current.keyword;
+
       let results: InfoBriefItem[] = [];
 
-      if (pendingSearch.current.keyword === "") {
+      if (searchKeyword === "") {
         results = _.cloneDeep(allInfo.current);
       } else {
-        results = allInfo.current.filter(
-          (x) =>
-            x.name.toLowerCase().includes(pendingSearch.current.keyword) ||
-            x.studentId.toLowerCase().includes(pendingSearch.current.keyword) ||
-            x.className.toLowerCase().includes(pendingSearch.current.keyword) ||
-            x.city.toLowerCase().includes(pendingSearch.current.keyword)
-        );
+        results = allInfo.current.filter((x) => {
+          const classItem = classIdItemMap.get(x.className);
+
+          let classMatch = false;
+
+          if (classItem && searchKeyword !== "班") {
+            classMatch = getClassSearchList(classItem).some((y) =>
+              y.toLowerCase().includes(searchKeyword)
+            );
+          }
+
+          return (
+            x.name.toLowerCase().includes(searchKeyword) ||
+            x.studentId.toLowerCase().includes(searchKeyword) ||
+            x.city.toLowerCase().includes(searchKeyword) ||
+            classMatch
+          );
+        });
       }
 
       setDisplayedInfo(results.sort(getStringSorter("name")));
@@ -619,10 +637,6 @@ const Home: React.FC = () => {
                           e.sentence.trim() === "" ? null : e.sentence.trim(),
                       };
 
-                      if (!dto.className.endsWith("班")) {
-                        dto.className += "班";
-                      }
-
                       handleRequest(
                         REQ<InfoSubmitEditDto, ResponseType>(
                           infoEditState.mode === "SUBMIT"
@@ -671,17 +685,29 @@ const Home: React.FC = () => {
                         },
                       ]}
                     >
-                      <Input
-                        placeholder="“信息安全2班”"
+                      <Select
+                        placeholder="选择你的班级"
                         onChange={(e) =>
                           setInfoEditState((value) =>
                             _.merge({}, value, {
                               formInitialValues: {
-                                className: e.target.value,
+                                className: e,
                               },
                             })
                           )
                         }
+                        optionLabelProp="value"
+                        options={(classList as ClassListItem[]).map((x) => ({
+                          value: x.class,
+                          label: (
+                            <Flex className={styles.flexClassItem} vertical>
+                              <div>{x.class}</div>
+                              <div className="class-desc">
+                                {getClassDesc(x)}
+                              </div>
+                            </Flex>
+                          ),
+                        }))}
                       />
                     </Form.Item>
 
@@ -860,7 +886,7 @@ const Home: React.FC = () => {
                   <Flex vertical align="flex-start">
                     <div className="name">{item.name}</div>
                     <div className="class-id-city">
-                      {item.className} {item.studentId} {item.city}
+                      {item.className}班 {item.studentId} {item.city}
                     </div>
                     <Button
                       className="info"

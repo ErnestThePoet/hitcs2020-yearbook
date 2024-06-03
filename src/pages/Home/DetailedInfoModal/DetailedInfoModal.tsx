@@ -4,9 +4,11 @@ import {
   InfoGetOneDto,
   InfoGetOneResponse,
 } from "@/modules/api/interfaces";
-import { Flex, Modal, Skeleton } from "antd";
+import { Flex, Modal, Skeleton, Tooltip } from "antd";
 import React, { memo, useEffect, useRef, useState } from "react";
 import styles from "./DetailedInfoModal.module.scss";
+import { getClassDesc } from "@/modules/utils/class-util";
+import { classIdItemMap } from "@/assets/class-list";
 
 interface DetailedInfoModalProps {
   open: boolean;
@@ -72,8 +74,19 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
             ) : (
               <>
                 <div className="name">{detailedInfo.name}</div>
+
                 <div className="class-id">
-                  {detailedInfo.className} {detailedInfo.studentId}
+                  <Tooltip
+                    color="orange"
+                    title={getClassDesc(
+                      classIdItemMap.get(detailedInfo.className)!
+                    )}
+                  >
+                    <span className="class-name">
+                      {detailedInfo.className}班
+                    </span>
+                  </Tooltip>
+                  {` ${detailedInfo.studentId}`}
                 </div>
                 <div className="location">
                   <img className="img-location" src="/loc.svg" alt="loc" />

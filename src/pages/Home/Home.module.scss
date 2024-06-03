@@ -67,6 +67,15 @@
   }
 }
 
+.flexClassItem {
+  div[class="class-desc"] {
+    font-size: 12px;
+    line-height: 15px;
+    color: #555;
+    white-space: pre-wrap;
+  }
+}
+
 .listSearchResult {
   overflow: hidden;
 

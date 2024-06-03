@@ -1,0 +1,155 @@
+[
+  {
+    "class": "2003101",
+    "major": {
+      "name": "计算机科学与技术",
+      "aliases": ["计科"]
+    },
+    "classNo": "1",
+    "direction": "计算机工程"
+  },
+  {
+    "class": "2003102",
+    "major": {
+      "name": "计算机科学与技术",
+      "aliases": ["计科"]
+    },
+    "classNo": "2",
+    "direction": "计算机科学"
+  },
+  {
+    "class": "2003103",
+    "major": {
+      "name": "计算机科学与技术",
+      "aliases": ["计科"]
+    },
+    "classNo": "3",
+    "direction": "智能信息处理"
+  },
+  {
+    "class": "2003104",
+    "major": {
+      "name": "计算机科学与技术",
+      "aliases": ["计科"]
+    },
+    "classNo": "4",
+    "direction": "智能信息处理"
+  },
+  {
+    "class": "2003201",
+    "major": {
+      "name": "信息安全",
+      "aliases": ["信安"]
+    },
+    "classNo": "1",
+    "direction": null
+  },
+  {
+    "class": "2003202",
+    "major": {
+      "name": "信息安全",
+      "aliases": ["信安"]
+    },
+    "classNo": "2",
+    "direction": null
+  },
+  {
+    "class": "2003601",
+    "major": {
+      "name": "人工智能",
+      "aliases": ["人智"]
+    },
+    "classNo": "1",
+    "direction": "自然语言处理"
+  },
+  {
+    "class": "2003602",
+    "major": {
+      "name": "人工智能",
+      "aliases": ["人智"]
+    },
+    "classNo": "2",
+    "direction": "视听觉信息处理"
+  },
+  {
+    "class": "2037101",
+    "major": {
+      "name": "软件工程",
+      "aliases": ["软工"]
+    },
+    "classNo": "1",
+    "direction": "软件服务工程"
+  },
+  {
+    "class": "2037102",
+    "major": {
+      "name": "软件工程",
+      "aliases": ["软工"]
+    },
+    "classNo": "2",
+    "direction": "移动互联网与媒体技术"
+  },
+  {
+    "class": "2037301",
+    "major": {
+      "name": "物联网工程",
+      "aliases": ["物联网"]
+    },
+    "classNo": "1",
+    "direction": null
+  },
+  {
+    "class": "2003501",
+    "major": {
+      "name": "数据科学与大数据技术",
+      "aliases": ["大数据"]
+    },
+    "classNo": "1",
+    "direction": null
+  },
+  {
+    "class": "20G0311",
+    "major": {
+      "name": "英才",
+      "aliases": []
+    },
+    "classNo": null,
+    "direction": null
+  },
+  {
+    "class": "20G0321",
+    "major": {
+      "name": "英才",
+      "aliases": []
+    },
+    "classNo": null,
+    "direction": null
+  },
+  {
+    "class": "20G0351",
+    "major": {
+      "name": "英才",
+      "aliases": []
+    },
+    "classNo": null,
+    "direction": null
+  },
+  {
+    "class": "20G0361",
+    "major": {
+      "name": "英才",
+      "aliases": []
+    },
+    "classNo": null,
+    "direction": null
+  },
+  {
+    "class": "20G3711",
+    "major": {
+      "name": "英才",
+      "aliases": []
+    },
+    "classNo": null,
+    "direction": null
+  }
+]
