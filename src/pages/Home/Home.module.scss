@@ -33,7 +33,7 @@
 }
 
 .cardInfoOpWrapper {
-  div[class="ant-card-body"] {
+  div[class~="ant-card-body"] {
     padding: 10px;
   }
 
@@ -79,11 +79,11 @@
 .listSearchResult {
   overflow: hidden;
 
-  div[class="ant-list-header"] {
+  div[class~="ant-list-header"] {
     padding: 6px 16px;
   }
 
-  li[class="ant-list-item"] {
+  li[class~="ant-list-item"] {
     user-select: none;
 
     cursor: pointer;

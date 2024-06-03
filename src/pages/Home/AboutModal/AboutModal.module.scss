@@ -1,7 +1,7 @@
 @import "../../../styles/common.scss";
 
 .modal {
-  div[class="ant-modal-content"] {
+  div[class~="ant-modal-content"] {
     background: {
       image: url("/bkg-about.jpg");
       size: cover;

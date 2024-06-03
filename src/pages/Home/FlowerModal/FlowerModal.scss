@@ -13,7 +13,7 @@
 .flower-modal {
   width: min(90vw, 600px) !important;
 
-  div[class="ant-modal-content"] {
+  div[class~="ant-modal-content"] {
     background-color: #f9f6e1;
   }
 
