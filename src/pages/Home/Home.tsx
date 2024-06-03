@@ -484,7 +484,7 @@ const Home: React.FC = () => {
 
   return (
     <main className={styles.main}>
-      <audio autoPlay loop ref={bgmAudio}>
+      <audio loop ref={bgmAudio}>
         <source src="/bgm.mp3" />
       </audio>
 
