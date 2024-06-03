@@ -33,6 +33,7 @@ import Icon, {
   EditOutlined,
   QuestionCircleOutlined,
   UserOutlined,
+  InfoOutlined,
   HeartOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
@@ -53,6 +54,7 @@ import { classIdItemMap } from "@/assets/class-list";
 import Pinyin from "pinyin-match";
 import Music from "@/assets/icons/music";
 import Mute from "@/assets/icons/mute";
+import SendWordsModal from "./SendWordsModal/SendWordsModal";
 
 const { BMapGL } = window as any;
 
@@ -113,6 +115,9 @@ const Home: React.FC = () => {
     deleteInfo: {
       open: boolean;
     };
+    sendWords: {
+      open: boolean;
+    };
     about: {
       open: boolean;
     };
@@ -125,6 +130,9 @@ const Home: React.FC = () => {
       open: false,
     },
     deleteInfo: {
+      open: false,
+    },
+    sendWords: {
       open: false,
     },
     about: {
@@ -375,6 +383,14 @@ const Home: React.FC = () => {
     );
   }, [syncAllInfo, syncSelfInfo]);
 
+  const sendWordsModalOnCancel = useCallback(
+    () =>
+      setModalState((value) =>
+        _.merge({}, value, { sendWords: { open: false } })
+      ),
+    []
+  );
+
   const aboutModalOnCancel = useCallback(
     () =>
       setModalState((value) => _.merge({}, value, { about: { open: false } })),
@@ -481,6 +497,17 @@ const Home: React.FC = () => {
 
           <Button
             icon={<HeartOutlined />}
+            shape="circle"
+            size="large"
+            onClick={() =>
+              setModalState((value) =>
+                _.merge({}, value, { sendWords: { open: true } })
+              )
+            }
+          />
+
+          <Button
+            icon={<InfoOutlined />}
             shape="circle"
             size="large"
             onClick={() =>
@@ -940,6 +967,11 @@ const Home: React.FC = () => {
         open={modalState.deleteInfo.open}
         onCancel={deleteInfoModalOnCancel}
         onSuccess={deleteInfoModalOnSuccess}
+      />
+
+      <SendWordsModal
+        open={modalState.sendWords.open}
+        onCancel={sendWordsModalOnCancel}
       />
 
       <AboutModal open={modalState.about.open} onCancel={aboutModalOnCancel} />

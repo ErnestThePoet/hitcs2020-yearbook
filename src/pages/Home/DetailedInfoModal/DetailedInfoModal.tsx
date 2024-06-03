@@ -4,11 +4,12 @@ import {
   InfoGetOneDto,
   InfoGetOneResponse,
 } from "@/modules/api/interfaces";
-import { Flex, Modal, Skeleton, Tooltip } from "antd";
+import { Flex, Skeleton, Tooltip } from "antd";
 import React, { memo, useEffect, useRef, useState } from "react";
 import styles from "./DetailedInfoModal.module.scss";
 import { getClassDesc } from "@/modules/utils/class-util";
 import { classIdItemMap } from "@/assets/class-list";
+import FlowerModal from "../FlowerModal/FlowerModal";
 
 interface DetailedInfoModalProps {
   open: boolean;
@@ -54,19 +55,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
     }, [open, id]);
 
     return (
-      <Modal
-        className={styles.modal}
-        rootClassName={styles.modalRoot}
-        centered
-        open={open}
-        footer={null}
-        onCancel={onCancel}
-      >
-        <>
-          <img className="flower-tl" src="/flowertl.png" alt="flower" />
-          <img className="flower-bl" src="/flowerbl.png" alt="flower" />
-          <img className="flower-br" src="/flowerbr.png" alt="flower" />
-        </>
+      <FlowerModal open={open} onCancel={onCancel}>
         {detailedInfo ? (
           <Flex className={styles.flexInfoWrapper} vertical gap={8}>
             {loading ? (
@@ -115,7 +104,7 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
         ) : (
           <div>暂无信息</div>
         )}
-      </Modal>
+      </FlowerModal>
     );
   }
 );

@@ -1,0 +1,74 @@
+@import "../../../styles/common.scss";
+
+.flower-modal-root {
+  div[class~="ant-modal-mask"] {
+    z-index: 1002 !important;
+  }
+
+  div[class~="ant-modal-wrap"] {
+    z-index: 1002 !important;
+  }
+}
+
+.flower-modal {
+  width: min(90vw, 600px) !important;
+
+  div[class="ant-modal-content"] {
+    background-color: #f9f6e1;
+  }
+
+  div[class="flower-modal-flower-wrapper"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    img {
+      position: absolute;
+      user-select: none;
+      -webkit-user-drag: none;
+      z-index: 1005;
+    }
+
+    img[class="flower-modal-flower-tl"] {
+      top: 0;
+      left: 0;
+      width: min(72px, 12%);
+    }
+
+    img[class="flower-modal-flower-bl"] {
+      bottom: 0;
+      left: 0;
+      width: min(120px, 20%);
+    }
+
+    img[class="flower-modal-flower-br"] {
+      bottom: 0;
+      right: 0;
+      width: min(120px, 20%);
+    }
+  }
+}
+
+@mixin divFlowerModalContentWrapperCommon {
+  position: relative;
+
+  z-index: 1006;
+}
+
+@media (width<=700px) {
+  .flower-modal-content-wrapper {
+    @include divFlowerModalContentWrapperCommon;
+
+    padding: 30px 10px;
+  }
+}
+
+@media (width>700px) {
+  .flower-modal-content-wrapper {
+    @include divFlowerModalContentWrapperCommon;
+
+    padding: 30px 60px;
+  }
+}

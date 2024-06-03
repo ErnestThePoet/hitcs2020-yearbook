@@ -1,60 +1,11 @@
 @import "../../../styles/common.scss";
 
-.modalRoot {
-  div[class~="ant-modal-mask"] {
-    z-index: 1002 !important;
-  }
-
-  div[class~="ant-modal-wrap"] {
-    z-index: 1002 !important;
-  }
-}
-
-.modal {
-  width: min(90vw, 600px) !important;
-
-  div[class="ant-modal-content"] {
-    background-color: #f9f6e1;
-  }
-
-  img {
-    user-select: none;
-    -webkit-user-drag: none;
-    z-index: 1005;
-  }
-
-  img[class="flower-tl"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: min(72px, 12%);
-  }
-
-  img[class="flower-bl"] {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: min(120px, 20%);
-  }
-
-  img[class="flower-br"] {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: min(120px, 20%);
-  }
-}
-
-@mixin flexInfoWrapperCommon {
-  position: relative;
-
+.flexInfoWrapper {
   font-size: 18px;
   white-space: pre-wrap;
   word-break: break-all;
 
   @include noto-serif-sc;
-
-  z-index: 1006;
 
   div[class="name"] {
     @include ma-shan-zheng-regular;
@@ -93,21 +44,5 @@
     overflow-y: auto;
 
     @include colored-scroll-bar(#ffecc5, #ffecc5, #ffeecc, #f9f6e1);
-  }
-}
-
-@media (width<=700px) {
-  .flexInfoWrapper {
-    @include flexInfoWrapperCommon;
-
-    padding: 30px 10px;
-  }
-}
-
-@media (width>700px) {
-  .flexInfoWrapper {
-    @include flexInfoWrapperCommon;
-
-    padding: 30px 60px;
   }
 }

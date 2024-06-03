@@ -1,0 +1,35 @@
+@import "../../../styles/common.scss";
+
+.divSendWordsWrapper {
+  max-height: 70vh;
+  overflow-y: auto;
+
+  @include colored-scroll-bar(#ffecc5, #ffecc5, #ffeecc, #f9f6e1);
+}
+
+.collapse {
+  white-space: pre-wrap;
+  word-break: break-all;
+
+  div[class~="ant-collapse-header"] {
+    align-items: center !important;
+  }
+
+  div[class~="ant-collapse-content"] {
+    background-color: transparent;
+  }
+
+  div[class="name"] {
+    @include ma-shan-zheng-regular;
+
+    font-size: 22px;
+    line-height: 26px;
+  }
+
+  div[class="send-word"] {
+    @include noto-serif-sc;
+
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
