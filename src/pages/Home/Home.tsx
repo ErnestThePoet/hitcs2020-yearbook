@@ -52,6 +52,7 @@ import classList from "@/assets/class-list.json";
 import { ClassListItem } from "@/assets/interfaces";
 import { getClassDesc, getClassSearchList } from "@/modules/utils/class-util";
 import { classIdItemMap } from "@/assets/class-list";
+import Pinyin from "pinyin-match";
 
 const { BMapGL } = window as any;
 
@@ -196,7 +197,8 @@ const Home: React.FC = () => {
             x.name.toLowerCase().includes(searchKeyword) ||
             x.studentId.toLowerCase().includes(searchKeyword) ||
             x.city.toLowerCase().includes(searchKeyword) ||
-            classMatch
+            classMatch ||
+            Pinyin.match(x.name, searchKeyword)
           );
         });
       }
@@ -861,7 +863,7 @@ const Home: React.FC = () => {
               className={styles.listSearchResult}
               header={
                 <Input
-                  placeholder="搜索同学录..."
+                  placeholder="智能搜索同学录..."
                   allowClear
                   value={searchKeyword}
                   onChange={(e) => {
