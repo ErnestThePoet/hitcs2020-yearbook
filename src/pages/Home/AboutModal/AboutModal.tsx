@@ -19,7 +19,7 @@ const AboutModal: React.FC<AboutModalProps> = memo(({ open, onCancel }) => {
     >
       <Flex className={styles.flexContentWrapper} vertical>
         <div className="title">哈工大计算学部2020级同学录</div>
-        <Flex gap={5} justify="center">
+        <Flex gap={5} justify="center" wrap>
           前端开发/120L021615 崔子健
           <a
             href="https://github.com/ErnestThePoet/hitcs2020-yearbook"
@@ -29,7 +29,7 @@ const AboutModal: React.FC<AboutModalProps> = memo(({ open, onCancel }) => {
           </a>
           <a href="mailto: ecuiships@126.com">Email</a>
         </Flex>
-        <Flex gap={5} justify="center">
+        <Flex gap={5} justify="center" wrap>
           后端开发/120L021515 张靖宇
           <a
             href="https://github.com/yink12138/HITCS2020-backend"
