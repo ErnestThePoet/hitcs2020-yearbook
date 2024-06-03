@@ -51,7 +51,7 @@
   }
 }
 
-@mixin divFlowerModalContentWrapperCommon {
+@mixin flowerModalContentWrapperCommon {
   position: relative;
 
   z-index: 1006;
@@ -59,7 +59,7 @@
 
 @media (width<=700px) {
   .flower-modal-content-wrapper {
-    @include divFlowerModalContentWrapperCommon;
+    @include flowerModalContentWrapperCommon;
 
     padding: 30px 10px;
   }
@@ -67,7 +67,7 @@
 
 @media (width>700px) {
   .flower-modal-content-wrapper {
-    @include divFlowerModalContentWrapperCommon;
+    @include flowerModalContentWrapperCommon;
 
     padding: 30px 60px;
   }
