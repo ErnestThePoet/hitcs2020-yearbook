@@ -5,7 +5,16 @@
   white-space: pre-wrap;
   word-break: break-all;
 
+  // Make some space between content ant right scroll bar
+  margin-right: -6px;
+  padding-right: 6px;
+
+  max-height: 70vh;
+  overflow-y: auto;
+
   @include noto-serif-sc;
+
+  @include orange-scroll-bar;
 
   div[class="name"] {
     @include ma-shan-zheng-regular;
