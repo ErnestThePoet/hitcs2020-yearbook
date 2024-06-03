@@ -5,11 +5,12 @@ import {
   InfoGetOneResponse,
 } from "@/modules/api/interfaces";
 import { Flex, Skeleton, Tooltip } from "antd";
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import styles from "./DetailedInfoModal.module.scss";
 import { getClassDesc } from "@/modules/utils/class-util";
 import { classIdItemMap } from "@/assets/class-list";
 import FlowerModal from "../FlowerModal/FlowerModal";
+import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 
 interface DetailedInfoModalProps {
   open: boolean;
@@ -22,9 +23,6 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
     const [detailedInfo, setDetailedInfo] = useState<InfoDetailItem | null>(
       null
     );
-    const detailedInfoMap = useRef<Map<number, InfoDetailItem | null>>(
-      new Map()
-    );
 
     const [loading, setLoading] = useState(false);
 
@@ -33,8 +31,8 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
         return;
       }
 
-      if (detailedInfoMap.current.has(id)) {
-        setDetailedInfo(detailedInfoMap.current.get(id)!);
+      if (detailedInfoCache.has(id)) {
+        setDetailedInfo(detailedInfoCache.get(id)!);
         return;
       }
 
@@ -47,7 +45,10 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
         {
           onSuccess: (data) => {
             setDetailedInfo(data);
-            detailedInfoMap.current.set(id, data);
+
+            if (data) {
+              detailedInfoCache.set(id, data);
+            }
           },
           onFinish: () => setLoading(false),
         }

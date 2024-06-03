@@ -56,6 +56,7 @@ import Music from "@/assets/icons/music";
 import Mute from "@/assets/icons/mute";
 import SendWordsModal from "./SendWordsModal/SendWordsModal";
 import { useWindowSize } from "@/modules/hooks/use-window-size";
+import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 
 const { BMapGL } = window as any;
 
@@ -270,7 +271,7 @@ const Home: React.FC = () => {
         allInfo.current = data;
         doSearch(searchKeyword);
 
-        if (mapRef.current) {
+        if (mapRef.current && !infoEditingRef.current) {
           mapRef.current.clearOverlays();
           drawAllInfo(mapRef.current.getZoom() > WITH_LABEL_ZOOM);
         }
@@ -288,7 +289,12 @@ const Home: React.FC = () => {
         id: userId,
       }),
       {
-        onSuccess: (data) => setSelfInfo(data),
+        onSuccess: (data) => {
+          setSelfInfo(data);
+          if (data) {
+            detailedInfoCache.set(userId, data);
+          }
+        },
       }
     );
   }, [userId]);
@@ -447,7 +453,10 @@ const Home: React.FC = () => {
     syncSelfInfo();
     syncAllInfo();
 
-    const refetchIntervalId = setInterval(syncAllInfo, 30 * 1000);
+    const refetchIntervalId = setInterval(() => {
+      detailedInfoCache.clearExcept([userId!]);
+      syncAllInfo();
+    }, 60 * 1000);
 
     return () => clearInterval(refetchIntervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
