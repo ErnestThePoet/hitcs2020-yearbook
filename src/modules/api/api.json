@@ -6,6 +6,7 @@
 
   "INFO_GET_ONE": ["GET", "/info/get_one"],
   "INFO_GET_ALL": ["GET", "/info/get_all"],
+  "INFO_GET_ALL_COORDS": ["GET", "/info/get_all_coords"],
   "INFO_SUBMIT": ["POST", "/info/submit"],
   "INFO_UPDATE": ["PUT", "/info/update"],
   "INFO_DELETE": ["DELETE", "/info/delete"]

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { Button, Checkbox, Flex, Form, Input } from "antd";
+import { Button, Checkbox, Flex, Form, Input, Tooltip } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import styles from "./Login.module.scss";
 import { REQ, handleRequest } from "@/modules/api/api";
-import { setSessionData } from "@/modules/store/reducers/session/session";
+import {
+  setSessionData,
+  setVisitor,
+} from "@/modules/store/reducers/session/session";
 import { useAppDispatch } from "@/modules/store/hooks";
 import { hashSha256Utf8B64 } from "@/modules/utils/crypto";
 import { useLogin } from "@/modules/hooks/use-login";
@@ -83,6 +87,7 @@ const Login: React.FC = () => {
                       id: data.id,
                       name: data.name,
                       studentId: data.studentId,
+                      visitor: false,
                     })
                   );
 
@@ -162,6 +167,35 @@ const Login: React.FC = () => {
             <Button className="btn-login" type="primary" htmlType="submit">
               登录
             </Button>
+          </Form.Item>
+
+          <Form.Item
+            className="form-item-visitor"
+            wrapperCol={{
+              xs: {
+                offset: 0,
+              },
+              sm: {
+                offset: 4,
+              },
+            }}
+          >
+            <Flex justify="flex-end" align="center" gap={8}>
+              <Button
+                className="btn-visitor"
+                type="link"
+                onClick={() => {
+                  dispatch(setVisitor(true));
+                  navigate("/", { replace: true });
+                }}
+              >
+                以游客身份访问
+              </Button>
+
+              <Tooltip title="以游客身份访问，将只能在地图上查看匿名的去向坐标">
+                <QuestionCircleOutlined className="icon-visitor" />
+              </Tooltip>
+            </Flex>
           </Form.Item>
         </Form>
       </div>

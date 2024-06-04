@@ -27,6 +27,7 @@ export const TryAutoLogin = (
           id: data.id,
           name: data.name,
           studentId: data.studentId,
+          visitor: false,
         })
       );
 
@@ -49,12 +50,20 @@ interface UseLoginOptions {
   onAutoLoggedIn?: OnLoginCallBack;
 }
 
-export function useLogin(onLogin?: OnLoginCallBack): boolean;
-export function useLogin(options?: UseLoginOptions): boolean;
+interface UseLoginResponse {
+  loggedIn: boolean;
+  visitor: boolean;
+}
 
-export function useLogin(param?: OnLoginCallBack | UseLoginOptions): boolean {
+export function useLogin(onLogin?: OnLoginCallBack): UseLoginResponse;
+export function useLogin(options?: UseLoginOptions): UseLoginResponse;
+
+export function useLogin(
+  param?: OnLoginCallBack | UseLoginOptions
+): UseLoginResponse {
   const navigate = useNavigate();
   const userId = useAppSelector((state) => state.session.id);
+  const visitor = useAppSelector((state) => state.session.visitor);
   const dispatch = useAppDispatch();
 
   const loggedIn = useMemo(() => isLoggedIn(userId), [userId]);
@@ -71,6 +80,10 @@ export function useLogin(param?: OnLoginCallBack | UseLoginOptions): boolean {
     param !== undefined && !isCallback && Boolean(param.checkLoginOnly);
 
   useEffect(() => {
+    if (visitor) {
+      return;
+    }
+
     if (userId !== null) {
       onAlreadyLoggedIn?.({ navigate, dispatch });
     } else if (!checkLoginOnly) {
@@ -81,5 +94,5 @@ export function useLogin(param?: OnLoginCallBack | UseLoginOptions): boolean {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return loggedIn;
+  return { loggedIn, visitor };
 }

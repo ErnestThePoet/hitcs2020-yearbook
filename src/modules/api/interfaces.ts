@@ -50,9 +50,15 @@ export interface InfoBriefItem {
   coord: [number, number]; // 城市坐标
 }
 
+export interface InfoCoordOnlyItem {
+  coord: [number, number]; // 城市坐标
+}
+
 export type InfoGetOneResponse = ResponseType<InfoDetailItem | null>;
 
 export type InfoGetAllResponse = ResponseType<InfoBriefItem[]>;
+
+export type InfoGetAllCoordsResponse = ResponseType<InfoCoordOnlyItem[]>;
 
 export interface InfoSubmitEditDto {
   className: string; // 大学班级（必填）

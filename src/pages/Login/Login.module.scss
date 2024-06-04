@@ -84,21 +84,33 @@
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 15px;
 
-  padding-bottom: 20px;
-
   box-shadow: 10px 10px 10px 3px rgba(0, 0, 0, 0.5);
 
   animation-name: form-login-in;
   animation-duration: 1000ms;
   animation-timing-function: ease-in-out;
 
+  div[class~="form-item-remember"] {
+    div[class~="ant-form-item-control-input"] {
+      min-height: unset;
+    }
+  }
+
   button[class~="btn-login"] {
     width: 100%;
   }
 
-  div[class~="form-item-remember"] {
-    div[class~="ant-form-item-control-input"] {
-      min-height: unset;
+  div[class~="form-item-visitor"] {
+    margin-bottom: 0;
+
+    button[class~="btn-visitor"] {
+      padding: 0;
+      height: fit-content;
+    }
+
+    span[class~="icon-visitor"] {
+      color: #1677ff;
+      cursor: pointer;
     }
   }
 }
@@ -118,8 +130,10 @@
   }
 
   .formLogin {
-    @include formLoginCommon;
     padding: 50px;
+    padding-bottom: 20px;
+
+    @include formLoginCommon;
   }
 }
 
@@ -129,8 +143,10 @@
   }
 
   .formLogin {
-    @include formLoginCommon;
     padding: 30px;
+    padding-bottom: 10px;
+
+    @include formLoginCommon;
 
     div[class~="ant-form-item"] {
       margin-bottom: 12px;

@@ -3,7 +3,9 @@ import styles from "./Home.module.scss";
 import { useLogin } from "@/modules/hooks/use-login";
 import {
   InfoBriefItem,
+  InfoCoordOnlyItem,
   InfoDetailItem,
+  InfoGetAllCoordsResponse,
   InfoGetAllResponse,
   InfoGetOneDto,
   InfoGetOneResponse,
@@ -67,6 +69,8 @@ const INITIAL_ZOOM = 6;
 // Set to <=0 to disable
 const DETAILED_ZOOM_THRESHOLD = 5.8;
 
+const REFETCH_INTERVAL_MS = 60 * 1000;
+
 interface InfoEditFormFieldType {
   className: string;
   city: string;
@@ -76,7 +80,7 @@ interface InfoEditFormFieldType {
 }
 
 const Home: React.FC = () => {
-  const loggedIn = useLogin();
+  const { loggedIn, visitor } = useLogin();
 
   const windowSize = useWindowSize();
 
@@ -88,6 +92,7 @@ const Home: React.FC = () => {
   const userName = useAppSelector((state) => state.session.name);
 
   const allInfo = useRef<InfoBriefItem[]>([]);
+  const allInfoCoordOnly = useRef<InfoCoordOnlyItem[]>([]);
   const [selfInfo, setSelfInfo] = useState<InfoDetailItem | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -273,6 +278,23 @@ const Home: React.FC = () => {
     }
   }, []);
 
+  const drawAllInfoCoordOnly = useCallback((big: boolean) => {
+    if (!mapRef.current) {
+      return;
+    }
+
+    for (const info of allInfoCoordOnly.current) {
+      const marker = new BMapGL.Marker(coordToPoint(info.coord), {
+        icon: new BMapGL.Icon(
+          "/star.svg",
+          big ? new BMapGL.Size(18, 18) : new BMapGL.Size(10, 10)
+        ),
+      });
+
+      mapRef.current.addOverlay(marker);
+    }
+  }, []);
+
   const syncAllInfo = useCallback(() => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
       onSuccess: (data) => {
@@ -286,6 +308,21 @@ const Home: React.FC = () => {
       },
     });
   }, [doSearch, drawAllInfo, searchKeyword]);
+
+  const syncAllInfoCoordOnly = useCallback(() => {
+    handleRequest(REQ<null, InfoGetAllCoordsResponse>("INFO_GET_ALL_COORDS"), {
+      onSuccess: (data) => {
+        allInfoCoordOnly.current = data;
+
+        if (mapRef.current) {
+          mapRef.current.clearOverlays();
+          drawAllInfoCoordOnly(
+            mapRef.current.getZoom() > DETAILED_ZOOM_THRESHOLD
+          );
+        }
+      },
+    });
+  }, [drawAllInfoCoordOnly]);
 
   const syncSelfInfo = useCallback(() => {
     if (userId === null) {
@@ -430,8 +467,8 @@ const Home: React.FC = () => {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    // Second condition prevents reinitializing map during development HMR
-    if (!loggedIn || mapRef.current) {
+    // Third condition prevents reinitializing map during development HMR
+    if (!(loggedIn || visitor) || mapRef.current) {
       return;
     }
 
@@ -458,29 +495,39 @@ const Home: React.FC = () => {
         map.getZoom() > DETAILED_ZOOM_THRESHOLD
       ) {
         map.clearOverlays();
-        drawAllInfo(true);
+        (loggedIn ? drawAllInfo : drawAllInfoCoordOnly)(true);
       } else if (
         mapZoomStartZoom.current > DETAILED_ZOOM_THRESHOLD &&
         map.getZoom() <= DETAILED_ZOOM_THRESHOLD
       ) {
         map.clearOverlays();
-        drawAllInfo(false);
+        (loggedIn ? drawAllInfo : drawAllInfoCoordOnly)(false);
       }
     });
 
-    syncSelfInfo();
-    syncAllInfo();
-
-    const refetchIntervalId = setInterval(() => {
+    if (loggedIn) {
       syncSelfInfo();
       syncAllInfo();
-    }, 60 * 1000);
 
-    return () => clearInterval(refetchIntervalId);
+      const refetchIntervalId = setInterval(() => {
+        syncSelfInfo();
+        syncAllInfo();
+      }, REFETCH_INTERVAL_MS);
+
+      return () => clearInterval(refetchIntervalId);
+    } else {
+      syncAllInfoCoordOnly();
+
+      const refetchIntervalId = setInterval(() => {
+        syncAllInfoCoordOnly();
+      }, REFETCH_INTERVAL_MS);
+
+      return () => clearInterval(refetchIntervalId);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn]);
+  }, [loggedIn, visitor]);
 
-  if (!loggedIn) {
+  if (!(loggedIn || visitor)) {
     return <></>;
   }
 
@@ -498,12 +545,14 @@ const Home: React.FC = () => {
         gap={10}
         align="center"
       >
-        <Button
-          icon={<MenuOutlined />}
-          shape="circle"
-          size="large"
-          onClick={() => setDrawerOpen((open) => !open)}
-        />
+        {loggedIn && (
+          <Button
+            icon={<MenuOutlined />}
+            shape="circle"
+            size="large"
+            onClick={() => setDrawerOpen((open) => !open)}
+          />
+        )}
 
         <Button
           icon={
@@ -524,16 +573,18 @@ const Home: React.FC = () => {
           onClick={toggleBgmPlay}
         />
 
-        <Button
-          icon={<HeartOutlined />}
-          shape="circle"
-          size="large"
-          onClick={() =>
-            setModalState((value) =>
-              _.merge({}, value, { sendWords: { open: true } })
-            )
-          }
-        />
+        {loggedIn && (
+          <Button
+            icon={<HeartOutlined />}
+            shape="circle"
+            size="large"
+            onClick={() =>
+              setModalState((value) =>
+                _.merge({}, value, { sendWords: { open: true } })
+              )
+            }
+          />
+        )}
 
         <Button
           icon={<InfoOutlined />}
@@ -547,476 +598,485 @@ const Home: React.FC = () => {
         />
       </Flex>
 
-      <Drawer
-        title="操作中心"
-        onClose={() => setDrawerOpen(false)}
-        placement={windowSize.vertical ? "bottom" : "right"}
-        open={drawerOpen}
-        mask={false}
-        width="min(390px, 80vw)"
-        height="min(450px, 55vh)"
-        extra={
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: "0",
-                  label: "修改密码",
-                  icon: <LockOutlined />,
-                  onClick: () =>
-                    setModalState((value) =>
-                      _.merge({}, value, {
-                        changePw: { open: true },
-                      })
-                    ),
-                },
-                {
-                  key: "1",
-                  label: "退出登录",
-                  icon: <PoweroffOutlined />,
-                  onClick: () => {
-                    handleRequest(REQ<null, ResponseType>("AUTH_LOGOUT"), {
-                      onFinish: logout,
-                      suppressMessageShow: {
-                        error: true,
-                        axiosError: true,
-                        warning: true,
-                      },
-                    });
-                  },
-                },
-              ],
-            }}
-            placement="bottomRight"
-            arrow={{ pointAtCenter: true }}
-          >
-            <Button
-              className={styles.btnName}
-              type="link"
-              icon={<UserOutlined />}
-            >
-              {userName}
-            </Button>
-          </Dropdown>
-        }
-      >
-        <Flex vertical gap={24}>
-          <Card className={styles.cardInfoOpWrapper}>
-            <Flex vertical gap={5} align="center">
-              {selfInfo && userId !== null && !infoEditState.editing && (
-                <>
-                  <Tag color="green">🌞你已经填写过同学录信息了哦</Tag>
-                  <Flex gap={15}>
-                    <Button
-                      type="link"
-                      onClick={() => {
-                        goToLocation(coordToPoint(selfInfo.coord));
-                        viewDetailedInfo(userId);
-                      }}
-                    >
-                      查看
-                    </Button>
-                    <Button
-                      type="link"
-                      onClick={() => {
-                        const selfPoint = coordToPoint(selfInfo.coord);
-
-                        goToLocation(selfPoint, INITIAL_ZOOM, 3);
-
-                        setInfoEditState((value) => ({
-                          ...value,
-                          editing: true,
-                          mode: "EDIT",
-                          point: selfPoint,
-                          formInitialValues: {
-                            className: selfInfo.className,
-                            city: selfInfo.city,
-                            contact: selfInfo.contact ?? "",
-                            mainwork: selfInfo.mainwork ?? "",
-                            sentence: selfInfo.sentence ?? "",
-                          },
-                        }));
-
-                        initializeInfoSubmitEdit(selfPoint);
-                      }}
-                    >
-                      编辑
-                    </Button>
-                    <Button
-                      type="link"
-                      danger
-                      onClick={() =>
+      {loggedIn && (
+        <>
+          <Drawer
+            title="操作中心"
+            onClose={() => setDrawerOpen(false)}
+            placement={windowSize.vertical ? "bottom" : "right"}
+            open={drawerOpen}
+            mask={false}
+            width="min(390px, 80vw)"
+            height="min(450px, 55vh)"
+            extra={
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "0",
+                      label: "修改密码",
+                      icon: <LockOutlined />,
+                      onClick: () =>
                         setModalState((value) =>
                           _.merge({}, value, {
-                            deleteInfo: {
-                              open: true,
-                            },
+                            changePw: { open: true },
                           })
-                        )
-                      }
-                    >
-                      删除
-                    </Button>
-                  </Flex>
-                </>
-              )}
-              {!selfInfo && !infoEditState.editing && (
-                <>
-                  <Tag color="orange">✨你还没有填写同学录信息哦</Tag>
-                  <Flex gap={10}>
-                    <Button
-                      type="link"
-                      icon={<EditOutlined />}
-                      onClick={() => {
-                        goToLocation(POINT_BEIJING, INITIAL_ZOOM, 3);
+                        ),
+                    },
+                    {
+                      key: "1",
+                      label: "退出登录",
+                      icon: <PoweroffOutlined />,
+                      onClick: () => {
+                        handleRequest(REQ<null, ResponseType>("AUTH_LOGOUT"), {
+                          onFinish: logout,
+                          suppressMessageShow: {
+                            error: true,
+                            axiosError: true,
+                            warning: true,
+                          },
+                        });
+                      },
+                    },
+                  ],
+                }}
+                placement="bottomRight"
+                arrow={{ pointAtCenter: true }}
+              >
+                <Button
+                  className={styles.btnName}
+                  type="link"
+                  icon={<UserOutlined />}
+                >
+                  {userName}
+                </Button>
+              </Dropdown>
+            }
+          >
+            <Flex vertical gap={24}>
+              <Card className={styles.cardInfoOpWrapper}>
+                <Flex vertical gap={5} align="center">
+                  {selfInfo && userId !== null && !infoEditState.editing && (
+                    <>
+                      <Tag color="green">🌞你已经填写过同学录信息了哦</Tag>
+                      <Flex gap={15}>
+                        <Button
+                          type="link"
+                          onClick={() => {
+                            goToLocation(coordToPoint(selfInfo.coord));
+                            viewDetailedInfo(userId);
+                          }}
+                        >
+                          查看
+                        </Button>
+                        <Button
+                          type="link"
+                          onClick={() => {
+                            const selfPoint = coordToPoint(selfInfo.coord);
 
-                        setInfoEditState((value) => ({
-                          ...value,
-                          editing: true,
-                          mode: "SUBMIT",
-                        }));
+                            goToLocation(selfPoint, INITIAL_ZOOM, 3);
 
-                        initializeInfoSubmitEdit();
-                      }}
-                    >
-                      去填写
-                    </Button>
-                  </Flex>
-                </>
-              )}
+                            setInfoEditState((value) => ({
+                              ...value,
+                              editing: true,
+                              mode: "EDIT",
+                              point: selfPoint,
+                              formInitialValues: {
+                                className: selfInfo.className,
+                                city: selfInfo.city,
+                                contact: selfInfo.contact ?? "",
+                                mainwork: selfInfo.mainwork ?? "",
+                                sentence: selfInfo.sentence ?? "",
+                              },
+                            }));
 
-              {infoEditState.editing && (
-                <>
-                  {infoEditState.mode === "SUBMIT" ? (
-                    <b>填写同学录信息</b>
-                  ) : (
-                    <b>编辑同学录信息</b>
+                            initializeInfoSubmitEdit(selfPoint);
+                          }}
+                        >
+                          编辑
+                        </Button>
+                        <Button
+                          type="link"
+                          danger
+                          onClick={() =>
+                            setModalState((value) =>
+                              _.merge({}, value, {
+                                deleteInfo: {
+                                  open: true,
+                                },
+                              })
+                            )
+                          }
+                        >
+                          删除
+                        </Button>
+                      </Flex>
+                    </>
+                  )}
+                  {!selfInfo && !infoEditState.editing && (
+                    <>
+                      <Tag color="orange">✨你还没有填写同学录信息哦</Tag>
+                      <Flex gap={10}>
+                        <Button
+                          type="link"
+                          icon={<EditOutlined />}
+                          onClick={() => {
+                            goToLocation(POINT_BEIJING, INITIAL_ZOOM, 3);
+
+                            setInfoEditState((value) => ({
+                              ...value,
+                              editing: true,
+                              mode: "SUBMIT",
+                            }));
+
+                            initializeInfoSubmitEdit();
+                          }}
+                        >
+                          去填写
+                        </Button>
+                      </Flex>
+                    </>
                   )}
 
-                  <Form
-                    className={styles.formInfo}
-                    labelCol={{ span: 7 }}
-                    onFinish={(e: InfoEditFormFieldType) => {
-                      setInfoEditState((value) => ({
-                        ...value,
-                        loading: true,
-                      }));
+                  {infoEditState.editing && (
+                    <>
+                      {infoEditState.mode === "SUBMIT" ? (
+                        <b>填写同学录信息</b>
+                      ) : (
+                        <b>编辑同学录信息</b>
+                      )}
 
-                      const dto: InfoSubmitEditDto = {
-                        className: e.className.trim(),
-                        city: e.city.trim(),
-                        coord: pointToCoord(
-                          dragMarkerRef.current.getPosition()
-                        ),
-                        contact: e.contact.trim() || null,
-                        mainwork: e.mainwork.trim() || null,
-                        sentence: e.sentence.trimEnd() || null,
-                      };
+                      <Form
+                        className={styles.formInfo}
+                        labelCol={{ span: 7 }}
+                        onFinish={(e: InfoEditFormFieldType) => {
+                          setInfoEditState((value) => ({
+                            ...value,
+                            loading: true,
+                          }));
 
-                      handleRequest(
-                        REQ<InfoSubmitEditDto, ResponseType>(
-                          infoEditState.mode === "SUBMIT"
-                            ? "INFO_SUBMIT"
-                            : "INFO_UPDATE",
-                          dto
-                        ),
-                        {
-                          onSuccess: () => {
-                            message.success(
+                          const dto: InfoSubmitEditDto = {
+                            className: e.className.trim(),
+                            city: e.city.trim(),
+                            coord: pointToCoord(
+                              dragMarkerRef.current.getPosition()
+                            ),
+                            contact: e.contact.trim() || null,
+                            mainwork: e.mainwork.trim() || null,
+                            sentence: e.sentence.trimEnd() || null,
+                          };
+
+                          handleRequest(
+                            REQ<InfoSubmitEditDto, ResponseType>(
                               infoEditState.mode === "SUBMIT"
-                                ? "成功提交同学录信息"
-                                : "成功修改同学录信息"
-                            );
+                                ? "INFO_SUBMIT"
+                                : "INFO_UPDATE",
+                              dto
+                            ),
+                            {
+                              onSuccess: () => {
+                                message.success(
+                                  infoEditState.mode === "SUBMIT"
+                                    ? "成功提交同学录信息"
+                                    : "成功修改同学录信息"
+                                );
 
-                            finalizeInfoSubmitEdit();
+                                finalizeInfoSubmitEdit();
 
-                            syncSelfInfo();
-                            syncAllInfo();
-                            setInfoEditState((value) => ({
-                              ...value,
-                              editing: false,
-                            }));
-                          },
-                          onFinish: () =>
-                            setInfoEditState((value) => ({
-                              ...value,
-                              loading: false,
-                            })),
-                        }
-                      );
-                    }}
-                    initialValues={infoEditState.formInitialValues}
-                  >
-                    <Form.Item
-                      label="大学班级"
-                      name="className"
-                      rules={[
-                        {
-                          required: true,
-                          message: "请选择大学班级",
-                        },
-                        {
-                          whitespace: true,
-                          message: "请选择大学班级",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="选择你的班级"
-                        onChange={(e) =>
-                          setInfoEditState((value) =>
-                            _.merge({}, value, {
-                              formInitialValues: {
-                                className: e,
+                                syncSelfInfo();
+                                syncAllInfo();
+                                setInfoEditState((value) => ({
+                                  ...value,
+                                  editing: false,
+                                }));
                               },
-                            })
-                          )
-                        }
-                        optionLabelProp="value"
-                        options={(classList as ClassListItem[]).map((x) => ({
-                          value: x.class,
-                          label: (
-                            <Flex className={styles.flexClassItem} vertical>
-                              <div>{x.class}</div>
-                              <div className="class-desc">
-                                {getClassDesc(x)}
-                              </div>
-                            </Flex>
-                          ),
-                        }))}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      className="form-item-city"
-                      label="去向城市"
-                      name="city"
-                      rules={[
-                        {
-                          required: true,
-                          message: "请填写去向城市",
-                        },
-                        {
-                          whitespace: true,
-                          message: "请填写去向城市",
-                        },
-                      ]}
-                    >
-                      <Input
-                        placeholder="“哈尔滨”"
-                        onChange={(e) => {
-                          setInfoEditState((value) =>
-                            _.merge({}, value, {
-                              formInitialValues: {
-                                city: e.target.value,
-                              },
-                            })
-                          );
-                        }}
-                      />
-                    </Form.Item>
-
-                    <Form.Item
-                      className="form-item-please-select-coord"
-                      wrapperCol={{
-                        xs: {
-                          offset: 0,
-                        },
-                        sm: {
-                          offset: 7,
-                        },
-                      }}
-                    >
-                      <Flex align="center" wrap>
-                        并请拖动地图上的标记点，设置具体去向位置
-                        <Popconfirm
-                          title="为何不支持地图检索设置位置"
-                          description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索。请拖动地图上的标记点，手动设置位置坐标🥳"
-                          icon={<QuestionCircleOutlined />}
-                          okText="理解"
-                          showCancel={false}
-                        >
-                          <Button
-                            className="btn-why-cannot-search"
-                            type="link"
-                            tabIndex={-1}
-                          >
-                            (为何不支持检索?)
-                          </Button>
-                        </Popconfirm>
-                      </Flex>
-                    </Form.Item>
-
-                    <Form.Item label="具体去向" name="mainwork">
-                      <Input
-                        placeholder="(选填)“哈工大计算学部”"
-                        onChange={(e) => {
-                          setInfoEditState((value) =>
-                            _.merge({}, value, {
-                              formInitialValues: {
-                                mainwork: e.target.value,
-                              },
-                            })
-                          );
-                        }}
-                      />
-                    </Form.Item>
-
-                    <Form.Item label="联系方式" name="contact">
-                      <Input
-                        placeholder="(选填)“手机15000000000”"
-                        onChange={(e) => {
-                          setInfoEditState((value) =>
-                            _.merge({}, value, {
-                              formInitialValues: {
-                                contact: e.target.value,
-                              },
-                            })
-                          );
-                        }}
-                      />
-                    </Form.Item>
-
-                    <Form.Item label="毕业赠言" name="sentence">
-                      <Input.TextArea
-                        placeholder="(选填)"
-                        rows={8}
-                        onChange={(e) => {
-                          setInfoEditState((value) =>
-                            _.merge({}, value, {
-                              formInitialValues: {
-                                sentence: e.target.value,
-                              },
-                            })
-                          );
-                        }}
-                      />
-                    </Form.Item>
-
-                    <Form.Item>
-                      <Flex gap={15} justify="center">
-                        <Button
-                          className="btn-bottom"
-                          onClick={() => {
-                            finalizeInfoSubmitEdit();
-
-                            if (mapRef.current) {
-                              drawAllInfo(
-                                mapRef.current.getZoom() >
-                                  DETAILED_ZOOM_THRESHOLD
-                              );
+                              onFinish: () =>
+                                setInfoEditState((value) => ({
+                                  ...value,
+                                  loading: false,
+                                })),
                             }
+                          );
+                        }}
+                        initialValues={infoEditState.formInitialValues}
+                      >
+                        <Form.Item
+                          label="大学班级"
+                          name="className"
+                          rules={[
+                            {
+                              required: true,
+                              message: "请选择大学班级",
+                            },
+                            {
+                              whitespace: true,
+                              message: "请选择大学班级",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="选择你的班级"
+                            onChange={(e) =>
+                              setInfoEditState((value) =>
+                                _.merge({}, value, {
+                                  formInitialValues: {
+                                    className: e,
+                                  },
+                                })
+                              )
+                            }
+                            optionLabelProp="value"
+                            options={(classList as ClassListItem[]).map(
+                              (x) => ({
+                                value: x.class,
+                                label: (
+                                  <Flex
+                                    className={styles.flexClassItem}
+                                    vertical
+                                  >
+                                    <div>{x.class}</div>
+                                    <div className="class-desc">
+                                      {getClassDesc(x)}
+                                    </div>
+                                  </Flex>
+                                ),
+                              })
+                            )}
+                          />
+                        </Form.Item>
 
-                            setInfoEditState((value) => ({
-                              ...value,
-                              editing: false,
-                            }));
+                        <Form.Item
+                          className="form-item-city"
+                          label="去向城市"
+                          name="city"
+                          rules={[
+                            {
+                              required: true,
+                              message: "请填写去向城市",
+                            },
+                            {
+                              whitespace: true,
+                              message: "请填写去向城市",
+                            },
+                          ]}
+                        >
+                          <Input
+                            placeholder="“哈尔滨”"
+                            onChange={(e) => {
+                              setInfoEditState((value) =>
+                                _.merge({}, value, {
+                                  formInitialValues: {
+                                    city: e.target.value,
+                                  },
+                                })
+                              );
+                            }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item
+                          className="form-item-please-select-coord"
+                          wrapperCol={{
+                            xs: {
+                              offset: 0,
+                            },
+                            sm: {
+                              offset: 7,
+                            },
                           }}
-                          loading={infoEditState.loading}
                         >
-                          取消
-                        </Button>
+                          <Flex align="center" wrap>
+                            并请拖动地图上的标记点，设置具体去向位置
+                            <Popconfirm
+                              title="为何不支持地图检索设置位置"
+                              description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索。请拖动地图上的标记点，手动设置位置坐标🥳"
+                              icon={<QuestionCircleOutlined />}
+                              okText="理解"
+                              showCancel={false}
+                            >
+                              <Button
+                                className="btn-why-cannot-search"
+                                type="link"
+                                tabIndex={-1}
+                              >
+                                (为何不支持检索?)
+                              </Button>
+                            </Popconfirm>
+                          </Flex>
+                        </Form.Item>
+
+                        <Form.Item label="具体去向" name="mainwork">
+                          <Input
+                            placeholder="(选填)“哈工大计算学部”"
+                            onChange={(e) => {
+                              setInfoEditState((value) =>
+                                _.merge({}, value, {
+                                  formInitialValues: {
+                                    mainwork: e.target.value,
+                                  },
+                                })
+                              );
+                            }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item label="联系方式" name="contact">
+                          <Input
+                            placeholder="(选填)“手机15000000000”"
+                            onChange={(e) => {
+                              setInfoEditState((value) =>
+                                _.merge({}, value, {
+                                  formInitialValues: {
+                                    contact: e.target.value,
+                                  },
+                                })
+                              );
+                            }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item label="毕业赠言" name="sentence">
+                          <Input.TextArea
+                            placeholder="(选填)"
+                            rows={8}
+                            onChange={(e) => {
+                              setInfoEditState((value) =>
+                                _.merge({}, value, {
+                                  formInitialValues: {
+                                    sentence: e.target.value,
+                                  },
+                                })
+                              );
+                            }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item>
+                          <Flex gap={15} justify="center">
+                            <Button
+                              className="btn-bottom"
+                              onClick={() => {
+                                finalizeInfoSubmitEdit();
+
+                                if (mapRef.current) {
+                                  drawAllInfo(
+                                    mapRef.current.getZoom() >
+                                      DETAILED_ZOOM_THRESHOLD
+                                  );
+                                }
+
+                                setInfoEditState((value) => ({
+                                  ...value,
+                                  editing: false,
+                                }));
+                              }}
+                              loading={infoEditState.loading}
+                            >
+                              取消
+                            </Button>
+                            <Button
+                              className="btn-bottom"
+                              type="primary"
+                              htmlType="submit"
+                              loading={infoEditState.loading}
+                            >
+                              提交
+                            </Button>
+                          </Flex>
+                        </Form.Item>
+                      </Form>
+                    </>
+                  )}
+                </Flex>
+              </Card>
+
+              {!infoEditState.editing && (
+                <List
+                  className={styles.listSearchResult}
+                  header={
+                    <Input
+                      placeholder="智能搜索同学录..."
+                      allowClear
+                      value={searchKeyword}
+                      onChange={(e) => {
+                        setSearchKeyword(e.target.value);
+                        doSearch(e.target.value);
+                      }}
+                    />
+                  }
+                  bordered
+                  dataSource={displayedInfo}
+                  pagination={{
+                    size: "small",
+                    defaultPageSize: 20,
+                    pageSizeOptions: [10, 20, 30, 50, 100, 200],
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                  }}
+                  renderItem={(item) => (
+                    <List.Item
+                      onClick={() => goToLocation(coordToPoint(item.coord))}
+                    >
+                      <Flex vertical align="flex-start">
+                        <div className="name">{item.name}</div>
+                        <Flex gap={5}>
+                          <Tag bordered={false} color="processing">
+                            {item.className}班
+                          </Tag>
+                          <Tag bordered={false} color="cyan">
+                            {item.studentId}
+                          </Tag>
+                          <Tag
+                            className="tag-city"
+                            bordered={false}
+                            color="magenta"
+                            icon={<EnvironmentOutlined />}
+                          >
+                            {item.city}
+                          </Tag>
+                        </Flex>
                         <Button
-                          className="btn-bottom"
-                          type="primary"
-                          htmlType="submit"
-                          loading={infoEditState.loading}
+                          className="info"
+                          type="link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            viewDetailedInfo(item.id);
+                          }}
                         >
-                          提交
+                          查看同学录信息
                         </Button>
                       </Flex>
-                    </Form.Item>
-                  </Form>
-                </>
+                    </List.Item>
+                  )}
+                />
               )}
             </Flex>
-          </Card>
+          </Drawer>
 
-          {!infoEditState.editing && (
-            <List
-              className={styles.listSearchResult}
-              header={
-                <Input
-                  placeholder="智能搜索同学录..."
-                  allowClear
-                  value={searchKeyword}
-                  onChange={(e) => {
-                    setSearchKeyword(e.target.value);
-                    doSearch(e.target.value);
-                  }}
-                />
-              }
-              bordered
-              dataSource={displayedInfo}
-              pagination={{
-                size: "small",
-                defaultPageSize: 20,
-                pageSizeOptions: [10, 20, 30, 50, 100, 200],
-                showSizeChanger: true,
-                showQuickJumper: true,
-              }}
-              renderItem={(item) => (
-                <List.Item
-                  onClick={() => goToLocation(coordToPoint(item.coord))}
-                >
-                  <Flex vertical align="flex-start">
-                    <div className="name">{item.name}</div>
-                    <Flex gap={5}>
-                      <Tag bordered={false} color="processing">
-                        {item.className}班
-                      </Tag>
-                      <Tag bordered={false} color="cyan">
-                        {item.studentId}
-                      </Tag>
-                      <Tag
-                        className="tag-city"
-                        bordered={false}
-                        color="magenta"
-                        icon={<EnvironmentOutlined />}
-                      >
-                        {item.city}
-                      </Tag>
-                    </Flex>
-                    <Button
-                      className="info"
-                      type="link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        viewDetailedInfo(item.id);
-                      }}
-                    >
-                      查看同学录信息
-                    </Button>
-                  </Flex>
-                </List.Item>
-              )}
-            />
-          )}
-        </Flex>
-      </Drawer>
+          <DetailedInfoModal
+            open={modalState.detailedInfo.open}
+            id={modalState.detailedInfo.id}
+            onCancel={detailedInfoModalOnCancel}
+          />
 
-      <DetailedInfoModal
-        open={modalState.detailedInfo.open}
-        id={modalState.detailedInfo.id}
-        onCancel={detailedInfoModalOnCancel}
-      />
+          <ChangePwModal
+            open={modalState.changePw.open}
+            onCancel={changePwModalOnCancel}
+            onSuccess={logout}
+          />
 
-      <ChangePwModal
-        open={modalState.changePw.open}
-        onCancel={changePwModalOnCancel}
-        onSuccess={logout}
-      />
+          <DeleteInfoModal
+            open={modalState.deleteInfo.open}
+            onCancel={deleteInfoModalOnCancel}
+            onSuccess={deleteInfoModalOnSuccess}
+          />
 
-      <DeleteInfoModal
-        open={modalState.deleteInfo.open}
-        onCancel={deleteInfoModalOnCancel}
-        onSuccess={deleteInfoModalOnSuccess}
-      />
-
-      <SendWordsModal
-        open={modalState.sendWords.open}
-        onCancel={sendWordsModalOnCancel}
-      />
+          <SendWordsModal
+            open={modalState.sendWords.open}
+            onCancel={sendWordsModalOnCancel}
+          />
+        </>
+      )}
 
       <AboutModal open={modalState.about.open} onCancel={aboutModalOnCancel} />
     </main>
