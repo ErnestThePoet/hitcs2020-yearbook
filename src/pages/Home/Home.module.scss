@@ -95,7 +95,7 @@
     padding: 6px 16px;
 
     &:hover {
-      background-color: #e8f2ff;
+      background-color: #f1f9ff;
     }
 
     div[class="name"] {
@@ -105,6 +105,13 @@
     button[class~="info"] {
       padding: 0;
       height: fit-content;
+    }
+
+    span[class~="tag-city"] {
+      > [class~="anticon"] + span,
+      > span + [class~="anticon"] {
+        margin-inline-start: 0;
+      }
     }
   }
 }

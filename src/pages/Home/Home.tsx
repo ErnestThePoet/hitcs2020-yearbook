@@ -36,6 +36,7 @@ import Icon, {
   UserOutlined,
   InfoOutlined,
   HeartOutlined,
+  EnvironmentOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 import { ChangePwModal } from "./ChangePwModal/ChangePwModal";
@@ -960,9 +961,22 @@ const Home: React.FC = () => {
                 >
                   <Flex vertical align="flex-start">
                     <div className="name">{item.name}</div>
-                    <div className="class-id-city">
-                      {item.className}班 {item.studentId} {item.city}
-                    </div>
+                    <Flex gap={5}>
+                      <Tag bordered={false} color="processing">
+                        {item.className}班
+                      </Tag>
+                      <Tag bordered={false} color="cyan">
+                        {item.studentId}
+                      </Tag>
+                      <Tag
+                        className="tag-city"
+                        bordered={false}
+                        color="magenta"
+                        icon={<EnvironmentOutlined />}
+                      >
+                        {item.city}
+                      </Tag>
+                    </Flex>
                     <Button
                       className="info"
                       type="link"
