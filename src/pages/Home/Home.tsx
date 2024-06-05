@@ -573,18 +573,16 @@ const Home: React.FC = () => {
           onClick={toggleBgmPlay}
         />
 
-        {loggedIn && (
-          <Button
-            icon={<HeartOutlined />}
-            shape="circle"
-            size="large"
-            onClick={() =>
-              setModalState((value) =>
-                _.merge({}, value, { sendWords: { open: true } })
-              )
-            }
-          />
-        )}
+        <Button
+          icon={<HeartOutlined />}
+          shape="circle"
+          size="large"
+          onClick={() =>
+            setModalState((value) =>
+              _.merge({}, value, { sendWords: { open: true } })
+            )
+          }
+        />
 
         <Button
           icon={<InfoOutlined />}
@@ -1077,13 +1075,13 @@ const Home: React.FC = () => {
             onCancel={deleteInfoModalOnCancel}
             onSuccess={deleteInfoModalOnSuccess}
           />
-
-          <SendWordsModal
-            open={modalState.sendWords.open}
-            onCancel={sendWordsModalOnCancel}
-          />
         </>
       )}
+
+      <SendWordsModal
+        open={modalState.sendWords.open}
+        onCancel={sendWordsModalOnCancel}
+      />
 
       <AboutModal open={modalState.about.open} onCancel={aboutModalOnCancel} />
     </main>
