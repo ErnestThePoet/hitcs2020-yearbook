@@ -391,7 +391,7 @@ const Home: React.FC = () => {
   }, []);
 
   const goToLocation = useCallback(
-    (point: any, zoom: number = 12, verticalScreenLatOffset = 0.05) => {
+    (point: any, zoom: number = 12, verticalScreenLatOffset = 0.075) => {
       // Set center a little bit to south so bottom drawer won't shadow the point
       mapRef.current?.flyTo(
         new BMapGL.Point(
@@ -674,7 +674,7 @@ const Home: React.FC = () => {
                           onClick={() => {
                             const selfPoint = coordToPoint(selfInfo.coord);
 
-                            goToLocation(selfPoint, INITIAL_ZOOM, 3);
+                            goToLocation(selfPoint, INITIAL_ZOOM, 5);
 
                             setInfoEditState((value) => ({
                               ...value,
@@ -721,7 +721,7 @@ const Home: React.FC = () => {
                           type="link"
                           icon={<EditOutlined />}
                           onClick={() => {
-                            goToLocation(POINT_BEIJING, INITIAL_ZOOM, 3);
+                            goToLocation(POINT_BEIJING, INITIAL_ZOOM, 5);
 
                             setInfoEditState((value) => ({
                               ...value,
