@@ -81,6 +81,10 @@
 
   div[class~="ant-list-header"] {
     padding: 6px 16px;
+
+    div[class="div-item-count"] {
+      font-size: 13px;
+    }
   }
 
   li[class~="ant-list-item"] {

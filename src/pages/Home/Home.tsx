@@ -994,15 +994,22 @@ const Home: React.FC = () => {
                 <List
                   className={styles.listSearchResult}
                   header={
-                    <Input
-                      placeholder="智能搜索同学录..."
-                      allowClear
-                      value={searchKeyword}
-                      onChange={(e) => {
-                        setSearchKeyword(e.target.value);
-                        doSearch(e.target.value);
-                      }}
-                    />
+                    <Flex vertical align="center" gap={6}>
+                      <Input
+                        placeholder="智能搜索同学录..."
+                        allowClear
+                        value={searchKeyword}
+                        onChange={(e) => {
+                          setSearchKeyword(e.target.value);
+                          doSearch(e.target.value);
+                        }}
+                      />
+                      {displayedInfo.length > 0 && (
+                        <div className="div-item-count">
+                          共{displayedInfo.length}条同学录信息
+                        </div>
+                      )}
+                    </Flex>
                   }
                   bordered
                   dataSource={displayedInfo}
