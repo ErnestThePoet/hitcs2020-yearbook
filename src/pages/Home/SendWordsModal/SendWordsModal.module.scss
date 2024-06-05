@@ -16,13 +16,19 @@
   }
 }
 
-.divSendWordsWrapper {
+.flexSendWordsWrapper {
   max-height: 70vh;
   overflow-y: auto;
 
   @include noto-serif-sc;
 
   @include orange-scroll-bar;
+
+  div[class="hint"] {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #7b7b7b;
+  }
 }
 
 .collapse {
