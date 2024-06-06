@@ -51,7 +51,7 @@ export const ChangePwModal: React.FC<ChangePwModalProps> = memo(
             }),
             {
               onSuccess: () => {
-                message.success("修改密码成功");
+                message.success("修改密码成功，请重新登录");
                 onSuccess();
               },
               onFinish: () => setLoading(false),
