@@ -47,7 +47,7 @@ import {
   initialSessionState,
   setSessionData,
 } from "@/modules/store/reducers/session/session";
-import { coordToPoint, pointToCoord } from "@/modules/utils/map";
+import { coordToPoint, pointToCoord, randomAround } from "@/modules/utils/map";
 import { DeleteInfoModal } from "./DeleteInfoModal/DeleteInfoModal";
 import { getStringSorter } from "@/modules/utils/sortors";
 import AboutModal from "./AboutModal/AboutModal";
@@ -351,9 +351,12 @@ const Home: React.FC = () => {
 
     mapRef.current.clearOverlays();
 
-    const dragMarker = new BMapGL.Marker(initialPoint ?? POINT_BEIJING, {
-      enableDragging: true,
-    });
+    const dragMarker = new BMapGL.Marker(
+      initialPoint ?? randomAround(POINT_BEIJING),
+      {
+        enableDragging: true,
+      }
+    );
 
     const dragMarkerLabel = new BMapGL.Label("请设置位置", {
       offset: new BMapGL.Size(15, -22),
@@ -886,7 +889,9 @@ const Home: React.FC = () => {
                           }}
                         >
                           <Flex align="center" wrap>
-                            并请拖动地图上的标记点，设置具体去向位置
+                            <span className="span-please-select-coord">
+                              并请拖动地图上的标记点，设置具体去向位置
+                            </span>
                             <Popconfirm
                               title="为何不支持地图检索设置位置"
                               description="百度地图API的免费检索配额较低，因为经费原因暂不支持检索。请拖动地图上的标记点，手动设置位置坐标🥳"

@@ -59,6 +59,10 @@
     font-weight: bold;
     margin-bottom: 3px;
 
+    span[class="span-please-select-coord"] {
+      color: red;
+    }
+
     button[class~="btn-why-cannot-search"] {
       display: inline;
       font-weight: bold;
