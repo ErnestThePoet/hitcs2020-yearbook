@@ -88,7 +88,7 @@ const Home: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const userId = useAppSelector((state) => state.session.id);
+  const userStudentId = useAppSelector((state) => state.session.studentId);
   const userName = useAppSelector((state) => state.session.name);
 
   const allInfo = useRef<InfoBriefItem[]>([]);
@@ -119,7 +119,7 @@ const Home: React.FC = () => {
   const [modalState, setModalState] = useState<{
     detailedInfo: {
       open: boolean;
-      id: number;
+      studentId: string;
     };
     changePw: {
       open: boolean;
@@ -136,7 +136,7 @@ const Home: React.FC = () => {
   }>({
     detailedInfo: {
       open: false,
-      id: 0,
+      studentId: "",
     },
     changePw: {
       open: false,
@@ -241,7 +241,7 @@ const Home: React.FC = () => {
           _.merge({}, value, {
             detailedInfo: {
               open: true,
-              id: info.id,
+              studentId: info.studentId,
             },
           })
         );
@@ -325,24 +325,24 @@ const Home: React.FC = () => {
   }, [drawAllInfoCoordOnly]);
 
   const syncSelfInfo = useCallback(() => {
-    if (userId === null) {
+    if (userStudentId === null) {
       return;
     }
 
     handleRequest(
       REQ<InfoGetOneDto, InfoGetOneResponse>("INFO_GET_ONE", {
-        id: userId,
+        studentId: userStudentId,
       }),
       {
         onSuccess: (data) => {
           setSelfInfo(data);
           if (data) {
-            detailedInfoCache.set(userId, data);
+            detailedInfoCache.set(userStudentId, data);
           }
         },
       }
     );
-  }, [userId]);
+  }, [userStudentId]);
 
   const initializeInfoSubmitEdit = useCallback((initialPoint?: any) => {
     if (!mapRef.current) {
@@ -404,11 +404,11 @@ const Home: React.FC = () => {
     [windowSize.vertical]
   );
 
-  const viewDetailedInfo = useCallback((id: number) => {
+  const viewDetailedInfo = useCallback((studentId: string) => {
     setModalState((value) =>
       _.merge({}, value, {
         detailedInfo: {
-          id,
+          studentId,
           open: true,
         },
       })
@@ -654,63 +654,65 @@ const Home: React.FC = () => {
             <Flex vertical gap={24}>
               <Card className={styles.cardInfoOpWrapper}>
                 <Flex vertical gap={5} align="center">
-                  {selfInfo && userId !== null && !infoEditState.editing && (
-                    <>
-                      <Tag color="green">🌞你已经填写过同学录信息了哦</Tag>
-                      <Flex gap={15}>
-                        <Button
-                          type="link"
-                          onClick={() => {
-                            goToLocation(coordToPoint(selfInfo.coord));
-                            viewDetailedInfo(userId);
-                          }}
-                        >
-                          查看
-                        </Button>
-                        <Button
-                          type="link"
-                          onClick={() => {
-                            const selfPoint = coordToPoint(selfInfo.coord);
+                  {selfInfo &&
+                    userStudentId !== null &&
+                    !infoEditState.editing && (
+                      <>
+                        <Tag color="green">🌞你已经填写过同学录信息了哦</Tag>
+                        <Flex gap={15}>
+                          <Button
+                            type="link"
+                            onClick={() => {
+                              goToLocation(coordToPoint(selfInfo.coord));
+                              viewDetailedInfo(userStudentId);
+                            }}
+                          >
+                            查看
+                          </Button>
+                          <Button
+                            type="link"
+                            onClick={() => {
+                              const selfPoint = coordToPoint(selfInfo.coord);
 
-                            goToLocation(selfPoint, INITIAL_ZOOM, 5);
+                              goToLocation(selfPoint, INITIAL_ZOOM, 5);
 
-                            setInfoEditState((value) => ({
-                              ...value,
-                              editing: true,
-                              mode: "EDIT",
-                              point: selfPoint,
-                              formInitialValues: {
-                                className: selfInfo.className,
-                                city: selfInfo.city,
-                                contact: selfInfo.contact ?? "",
-                                mainwork: selfInfo.mainwork ?? "",
-                                sentence: selfInfo.sentence ?? "",
-                              },
-                            }));
-
-                            initializeInfoSubmitEdit(selfPoint);
-                          }}
-                        >
-                          编辑
-                        </Button>
-                        <Button
-                          type="link"
-                          danger
-                          onClick={() =>
-                            setModalState((value) =>
-                              _.merge({}, value, {
-                                deleteInfo: {
-                                  open: true,
+                              setInfoEditState((value) => ({
+                                ...value,
+                                editing: true,
+                                mode: "EDIT",
+                                point: selfPoint,
+                                formInitialValues: {
+                                  className: selfInfo.className,
+                                  city: selfInfo.city,
+                                  contact: selfInfo.contact ?? "",
+                                  mainwork: selfInfo.mainwork ?? "",
+                                  sentence: selfInfo.sentence ?? "",
                                 },
-                              })
-                            )
-                          }
-                        >
-                          删除
-                        </Button>
-                      </Flex>
-                    </>
-                  )}
+                              }));
+
+                              initializeInfoSubmitEdit(selfPoint);
+                            }}
+                          >
+                            编辑
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() =>
+                              setModalState((value) =>
+                                _.merge({}, value, {
+                                  deleteInfo: {
+                                    open: true,
+                                  },
+                                })
+                              )
+                            }
+                          >
+                            删除
+                          </Button>
+                        </Flex>
+                      </>
+                    )}
                   {!selfInfo && !infoEditState.editing && (
                     <>
                       <Tag color="orange">✨你还没有填写同学录信息哦</Tag>
@@ -1045,7 +1047,7 @@ const Home: React.FC = () => {
                           type="link"
                           onClick={(e) => {
                             e.stopPropagation();
-                            viewDetailedInfo(item.id);
+                            viewDetailedInfo(item.studentId);
                           }}
                         >
                           查看同学录信息
@@ -1060,7 +1062,7 @@ const Home: React.FC = () => {
 
           <DetailedInfoModal
             open={modalState.detailedInfo.open}
-            id={modalState.detailedInfo.id}
+            studentId={modalState.detailedInfo.studentId}
             onCancel={detailedInfoModalOnCancel}
           />
 

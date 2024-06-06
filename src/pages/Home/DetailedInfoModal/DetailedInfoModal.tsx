@@ -14,12 +14,12 @@ import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 
 interface DetailedInfoModalProps {
   open: boolean;
-  id: number;
+  studentId: string;
   onCancel: () => void;
 }
 
 const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
-  ({ open, id, onCancel }) => {
+  ({ open, studentId, onCancel }) => {
     const [detailedInfo, setDetailedInfo] = useState<InfoDetailItem | null>(
       null
     );
@@ -31,8 +31,8 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
         return;
       }
 
-      if (detailedInfoCache.has(id)) {
-        setDetailedInfo(detailedInfoCache.get(id)!);
+      if (detailedInfoCache.has(studentId)) {
+        setDetailedInfo(detailedInfoCache.get(studentId)!);
         return;
       }
 
@@ -40,20 +40,20 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
 
       handleRequest(
         REQ<InfoGetOneDto, InfoGetOneResponse>("INFO_GET_ONE", {
-          id,
+          studentId,
         }),
         {
           onSuccess: (data) => {
             setDetailedInfo(data);
 
             if (data) {
-              detailedInfoCache.set(id, data);
+              detailedInfoCache.set(studentId, data);
             }
           },
           onFinish: () => setLoading(false),
         }
       );
-    }, [open, id]);
+    }, [open, studentId]);
 
     return (
       <FlowerModal centered open={open} onCancel={onCancel}>

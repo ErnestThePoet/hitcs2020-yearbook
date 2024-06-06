@@ -5,22 +5,22 @@ class DetailedInfoCache {
     this.cache = new Map();
   }
 
-  private cache: Map<number, InfoDetailItem>;
+  private cache: Map<string, InfoDetailItem>;
 
-  set(id: number, item: InfoDetailItem) {
-    this.cache.set(id, item);
+  set(studentId: string, item: InfoDetailItem) {
+    this.cache.set(studentId, item);
   }
 
-  has(id: number): boolean {
-    return this.cache.has(id);
+  has(studentId: string): boolean {
+    return this.cache.has(studentId);
   }
 
-  get(id: number): InfoDetailItem | null {
-    return this.cache.get(id) ?? null;
+  get(studentId: string): InfoDetailItem | null {
+    return this.cache.get(studentId) ?? null;
   }
 
-  delete(id: number) {
-    this.cache.delete(id);
+  delete(studentId: string) {
+    this.cache.delete(studentId);
   }
 }
 

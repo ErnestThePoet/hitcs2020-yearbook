@@ -26,7 +26,7 @@ export interface ChangePwDto {
 }
 
 export interface InfoGetOneDto {
-  id: number;
+  studentId: string;
 }
 
 export interface InfoDetailItem {
