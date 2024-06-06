@@ -2,7 +2,7 @@ import { Flex, Form, Input, Modal, Tag, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import React, { memo, useState } from "react";
 import { REQ, handleRequest } from "@/modules/api/api";
-import { hashSha256Utf8B64 } from "@/modules/utils/crypto";
+import { hashSha256Utf8Hex } from "@/modules/utils/crypto";
 import {
   USER_PASSWORD_HINT,
   USER_PASSWORD_PATTERN,
@@ -46,8 +46,8 @@ export const ChangePwModal: React.FC<ChangePwModalProps> = memo(
           setLoading(true);
           handleRequest(
             REQ<ChangePwDto, ResponseType>("AUTH_CHANGE_PW", {
-              oldPwHashed1: hashSha256Utf8B64(values.oldPassword),
-              newPwHashed1: hashSha256Utf8B64(values.newPassword1),
+              oldPwHashed1: hashSha256Utf8Hex(values.oldPassword),
+              newPwHashed1: hashSha256Utf8Hex(values.newPassword1),
             }),
             {
               onSuccess: () => {

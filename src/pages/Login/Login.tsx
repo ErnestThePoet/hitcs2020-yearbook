@@ -8,7 +8,7 @@ import {
   setVisitor,
 } from "@/modules/store/reducers/session/session";
 import { useAppDispatch } from "@/modules/store/hooks";
-import { hashSha256Utf8B64 } from "@/modules/utils/crypto";
+import { hashSha256Utf8Hex } from "@/modules/utils/crypto";
 import { useLogin } from "@/modules/hooks/use-login";
 import { LoginResponse, ManualLoginDto } from "@/modules/api/interfaces";
 import classNames from "classnames";
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
             handleRequest(
               REQ<ManualLoginDto, LoginResponse>("AUTH_MANUAL_LOGIN", {
                 account: e.userName,
-                pwHashed1: hashSha256Utf8B64(e.password),
+                pwHashed1: hashSha256Utf8Hex(e.password),
                 autoLogin: e.remember,
               }),
               {
