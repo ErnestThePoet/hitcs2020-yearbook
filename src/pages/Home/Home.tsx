@@ -183,6 +183,11 @@ const Home: React.FC = () => {
   const dragMarkerRef = useRef<any>(null);
   const mapZoomStartZoom = useRef(0);
 
+  const studentIdMarkerLabelMap = useRef<
+    Map<string, { marker: any; label: any }>
+  >(new Map());
+  const floatingUpStudentId = useRef<string>("");
+
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
   const toggleBgmPlay = useCallback(() => {
@@ -241,70 +246,112 @@ const Home: React.FC = () => {
     }, 100);
   }, []);
 
-  const drawAllInfo = useCallback((detailed: boolean) => {
-    if (!mapRef.current) {
+  const setFloatUpLabel = useCallback((studentId: string, floatUp: boolean) => {
+    if (!studentIdMarkerLabelMap.current.has(studentId)) {
       return;
     }
 
-    // TODO 实现聚簇
-    for (const info of allInfo.current) {
-      const clickListener = () =>
-        setModalState((value) =>
-          _.merge({}, value, {
-            detailedInfo: {
-              open: true,
-              studentId: info.studentId,
-            },
-          })
-        );
+    const markerLabel = studentIdMarkerLabelMap.current.get(studentId)!;
 
-      const marker = new BMapGL.Marker(coordToPoint(info.coord), {
-        icon: new BMapGL.Icon(
-          "/star.svg",
-          detailed ? new BMapGL.Size(18, 18) : new BMapGL.Size(12, 12)
-        ),
-      });
-
-      if (detailed) {
-        const label = new BMapGL.Label(info.name, {
-          offset: new BMapGL.Size(13, -11),
-        });
-        label.setStyle({
-          backgroundColor: "#fef6d5",
-          color: "#ea6500",
-          borderRadius: "10px",
-          borderColor: "#ffa12f",
-          padding: "0 5px",
-          fontSize: "12px",
-          lineHeight: "20px",
-          cursor: "pointer",
-        });
-
-        label.addEventListener("click", clickListener);
-
-        const setFloatUpStyle = () => {
-          marker.setStyle(FLOATUP_STYLE);
-          label.setStyle(FLOATUP_STYLE);
-        };
-
-        const setNoFloatUpStyle = () => {
-          marker.setStyle(NO_FLOATUP_STYLE);
-          label.setStyle(NO_FLOATUP_STYLE);
-        };
-
-        label.addEventListener("mouseover", setFloatUpStyle);
-        label.addEventListener("mouseout", setNoFloatUpStyle);
-
-        marker.addEventListener("mouseover", setFloatUpStyle);
-        marker.addEventListener("mouseout", setNoFloatUpStyle);
-
-        marker.setLabel(label);
+    if (!floatUp) {
+      if (floatingUpStudentId.current !== studentId) {
+        return;
       }
 
-      marker.addEventListener("click", clickListener);
-      mapRef.current.addOverlay(marker);
+      floatingUpStudentId.current = "";
+
+      markerLabel.marker.setStyle(NO_FLOATUP_STYLE);
+      markerLabel.label.setStyle(NO_FLOATUP_STYLE);
+
+      return;
     }
+
+    if (floatingUpStudentId.current === studentId) {
+      return;
+    }
+
+    if (studentIdMarkerLabelMap.current.has(floatingUpStudentId.current)) {
+      const markerLabelToClear = studentIdMarkerLabelMap.current.get(
+        floatingUpStudentId.current
+      )!;
+
+      markerLabelToClear.marker.setStyle(NO_FLOATUP_STYLE);
+      markerLabelToClear.label.setStyle(NO_FLOATUP_STYLE);
+    }
+
+    floatingUpStudentId.current = studentId;
+
+    markerLabel.marker.setStyle(FLOATUP_STYLE);
+    markerLabel.label.setStyle(FLOATUP_STYLE);
   }, []);
+
+  const drawAllInfo = useCallback(
+    (detailed: boolean) => {
+      if (!mapRef.current) {
+        return;
+      }
+
+      studentIdMarkerLabelMap.current.clear();
+
+      // TODO 实现聚簇
+      for (const info of allInfo.current) {
+        const clickListener = () => {
+          setModalState((value) =>
+            _.merge({}, value, {
+              detailedInfo: {
+                open: true,
+                studentId: info.studentId,
+              },
+            })
+          );
+
+          setFloatUpLabel(info.studentId, true);
+        };
+
+        const mouseOverListener = () => setFloatUpLabel(info.studentId, true);
+
+        const marker = new BMapGL.Marker(coordToPoint(info.coord), {
+          icon: new BMapGL.Icon(
+            "/star.svg",
+            detailed ? new BMapGL.Size(18, 18) : new BMapGL.Size(12, 12)
+          ),
+        });
+
+        if (detailed) {
+          const label = new BMapGL.Label(info.name, {
+            offset: new BMapGL.Size(13, -11),
+          });
+          label.setStyle({
+            backgroundColor: "#fef6d5",
+            color: "#ea6500",
+            borderRadius: "10px",
+            borderColor: "#ffa12f",
+            padding: "0 5px",
+            fontSize: "12px",
+            lineHeight: "20px",
+            cursor: "pointer",
+          });
+
+          label.addEventListener("click", clickListener);
+
+          label.addEventListener("mouseover", mouseOverListener);
+
+          marker.addEventListener("mouseover", mouseOverListener);
+
+          marker.setLabel(label);
+
+          studentIdMarkerLabelMap.current.set(info.studentId, {
+            marker,
+            label,
+          });
+        }
+
+        marker.addEventListener("click", clickListener);
+        mapRef.current.addOverlay(marker);
+      }
+    },
+    [setFloatUpLabel]
+  );
 
   const drawAllInfoCoordOnly = useCallback((big: boolean) => {
     if (!mapRef.current) {
@@ -435,16 +482,21 @@ const Home: React.FC = () => {
     [windowSize.vertical]
   );
 
-  const viewDetailedInfo = useCallback((studentId: string) => {
-    setModalState((value) =>
-      _.merge({}, value, {
-        detailedInfo: {
-          studentId,
-          open: true,
-        },
-      })
-    );
-  }, []);
+  const viewDetailedInfo = useCallback(
+    (studentId: string) => {
+      setModalState((value) =>
+        _.merge({}, value, {
+          detailedInfo: {
+            studentId,
+            open: true,
+          },
+        })
+      );
+
+      setFloatUpLabel(studentId, true);
+    },
+    [setFloatUpLabel]
+  );
 
   const detailedInfoModalOnCancel = useCallback(
     () =>
