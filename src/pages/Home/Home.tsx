@@ -275,7 +275,7 @@ const Home: React.FC = () => {
           backgroundColor: "#fef6d5",
           color: "#ea6500",
           borderRadius: "10px",
-          borderColor: "#ccc",
+          borderColor: "#ffa12f",
           padding: "0 5px",
           fontSize: "12px",
           lineHeight: "20px",
