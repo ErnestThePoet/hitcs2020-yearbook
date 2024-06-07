@@ -263,7 +263,7 @@ const Home: React.FC = () => {
       const marker = new BMapGL.Marker(coordToPoint(info.coord), {
         icon: new BMapGL.Icon(
           "/star.svg",
-          detailed ? new BMapGL.Size(18, 18) : new BMapGL.Size(10, 10)
+          detailed ? new BMapGL.Size(18, 18) : new BMapGL.Size(12, 12)
         ),
       });
 
@@ -317,7 +317,7 @@ const Home: React.FC = () => {
       const marker = new BMapGL.Marker(coordToPoint(info.coord), {
         icon: new BMapGL.Icon(
           "/star.svg",
-          big ? new BMapGL.Size(18, 18) : new BMapGL.Size(10, 10)
+          big ? new BMapGL.Size(18, 18) : new BMapGL.Size(12, 12)
         ),
       });
 
