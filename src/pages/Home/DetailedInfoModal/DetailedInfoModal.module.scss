@@ -16,6 +16,10 @@
 
   @include orange-scroll-bar;
 
+  div[class~="ant-divider"] {
+    margin-block: 0;
+  }
+
   div[class="name"] {
     @include ma-shan-zheng-regular;
 

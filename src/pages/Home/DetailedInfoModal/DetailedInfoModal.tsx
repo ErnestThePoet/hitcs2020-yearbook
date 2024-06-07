@@ -4,7 +4,7 @@ import {
   InfoGetOneDto,
   InfoGetOneResponse,
 } from "@/modules/api/interfaces";
-import { Flex, Skeleton, Tooltip } from "antd";
+import { Divider, Flex, Skeleton, Tooltip } from "antd";
 import React, { memo, useEffect, useState } from "react";
 import styles from "./DetailedInfoModal.module.scss";
 import { getClassDesc } from "@/modules/utils/class-util";
@@ -88,16 +88,22 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
                   {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
                 </div>
                 {detailedInfo.contact && (
-                  <Flex vertical>
-                    <div>联系方式：</div>
-                    <div className="contact">{detailedInfo.contact}</div>
-                  </Flex>
+                  <>
+                    <Divider />
+                    <Flex vertical>
+                      <div>联系方式：</div>
+                      <div className="contact">{detailedInfo.contact}</div>
+                    </Flex>
+                  </>
                 )}
                 {detailedInfo.sentence && (
-                  <Flex vertical>
-                    <div>毕业赠言：</div>
-                    <div className="sentence">{detailedInfo.sentence}</div>
-                  </Flex>
+                  <>
+                    <Divider />
+                    <Flex vertical>
+                      <div>毕业赠言：</div>
+                      <div className="sentence">{detailedInfo.sentence}</div>
+                    </Flex>
+                  </>
                 )}
               </>
             )}
