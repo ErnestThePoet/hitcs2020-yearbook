@@ -83,7 +83,7 @@ const INITIAL_ZOOM = 6;
 // Set to <=0 to disable
 const DETAILED_ZOOM_THRESHOLD = 5.8;
 
-const REFETCH_INTERVAL_MS = 1 * 1000;
+const REFETCH_INTERVAL_MS = 60 * 1000;
 
 interface InfoEditFormFieldType {
   className: string;
