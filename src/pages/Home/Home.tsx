@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./Home.module.scss";
 import { useLogin } from "@/modules/hooks/use-login";
 import {
@@ -62,7 +68,15 @@ import SendWordsModal from "./SendWordsModal/SendWordsModal";
 import { useWindowSize } from "@/modules/hooks/use-window-size";
 import detailedInfoCache from "@/modules/cache/detailed-info-cache";
 
-const { BMapGL } = window as any;
+const { BMapGL } = window as typeof window & { BMapGL: any };
+
+const NO_FLOATUP_STYLE: CSSProperties = {
+  zIndex: 0,
+};
+
+const FLOATUP_STYLE: CSSProperties = {
+  zIndex: 1,
+};
 
 const POINT_BEIJING = new BMapGL.Point(116.41338729034514, 39.910923647957596);
 const INITIAL_ZOOM = 6;
@@ -269,6 +283,22 @@ const Home: React.FC = () => {
         });
 
         label.addEventListener("click", clickListener);
+
+        const setFloatUpStyle = () => {
+          marker.setStyle(FLOATUP_STYLE);
+          label.setStyle(FLOATUP_STYLE);
+        };
+
+        const setNoFloatUpStyle = () => {
+          marker.setStyle(NO_FLOATUP_STYLE);
+          label.setStyle(NO_FLOATUP_STYLE);
+        };
+
+        label.addEventListener("mouseover", setFloatUpStyle);
+        label.addEventListener("mouseout", setNoFloatUpStyle);
+
+        marker.addEventListener("mouseover", setFloatUpStyle);
+        marker.addEventListener("mouseout", setNoFloatUpStyle);
 
         marker.setLabel(label);
       }
