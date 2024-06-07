@@ -83,7 +83,7 @@ const INITIAL_ZOOM = 6;
 // Set to <=0 to disable
 const DETAILED_ZOOM_THRESHOLD = 5.8;
 
-const REFETCH_INTERVAL_MS = 60 * 1000;
+const REFETCH_INTERVAL_MS = 1 * 1000;
 
 interface InfoEditFormFieldType {
   className: string;
@@ -199,9 +199,7 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  const doSearch = useCallback((keyword: string) => {
-    pendingSearch.current.keyword = keyword.trim().toLowerCase();
-
+  const doSearch = useCallback(() => {
     if (pendingSearch.current.pending) {
       return;
     }
@@ -329,7 +327,7 @@ const Home: React.FC = () => {
     handleRequest(REQ<null, InfoGetAllResponse>("INFO_GET_ALL"), {
       onSuccess: (data) => {
         allInfo.current = data;
-        doSearch(searchKeyword);
+        doSearch();
 
         if (mapRef.current && !infoEditingRef.current) {
           mapRef.current.clearOverlays();
@@ -337,7 +335,7 @@ const Home: React.FC = () => {
         }
       },
     });
-  }, [doSearch, drawAllInfo, searchKeyword]);
+  }, [doSearch, drawAllInfo]);
 
   const syncAllInfoCoordOnly = useCallback(() => {
     handleRequest(REQ<null, InfoGetAllCoordsResponse>("INFO_GET_ALL_COORDS"), {
@@ -1036,7 +1034,10 @@ const Home: React.FC = () => {
                         value={searchKeyword}
                         onChange={(e) => {
                           setSearchKeyword(e.target.value);
-                          doSearch(e.target.value);
+                          pendingSearch.current.keyword = e.target.value
+                            .trim()
+                            .toLowerCase();
+                          doSearch();
                         }}
                       />
                       {displayedInfo.length > 0 && (
