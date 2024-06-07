@@ -186,7 +186,7 @@ const Home: React.FC = () => {
   const studentIdMarkerLabelMap = useRef<
     Map<string, { marker: any; label: any }>
   >(new Map());
-  const floatingUpStudentId = useRef<string>("");
+  const floatingUpStudentId = useRef<string | null>(null);
 
   const bgmAudio = useRef<HTMLAudioElement | null>(null);
 
@@ -246,6 +246,7 @@ const Home: React.FC = () => {
     }, 100);
   }, []);
 
+  // Currently only label can float up; marker cannot
   const setFloatUpLabel = useCallback((studentId: string, floatUp: boolean) => {
     if (!studentIdMarkerLabelMap.current.has(studentId)) {
       return;
@@ -258,7 +259,7 @@ const Home: React.FC = () => {
         return;
       }
 
-      floatingUpStudentId.current = "";
+      floatingUpStudentId.current = null;
 
       markerLabel.marker.setStyle(NO_FLOATUP_STYLE);
       markerLabel.label.setStyle(NO_FLOATUP_STYLE);
@@ -266,11 +267,11 @@ const Home: React.FC = () => {
       return;
     }
 
-    if (floatingUpStudentId.current === studentId) {
-      return;
-    }
-
-    if (studentIdMarkerLabelMap.current.has(floatingUpStudentId.current)) {
+    if (
+      floatingUpStudentId.current &&
+      floatingUpStudentId.current !== studentId &&
+      studentIdMarkerLabelMap.current.has(floatingUpStudentId.current)
+    ) {
       const markerLabelToClear = studentIdMarkerLabelMap.current.get(
         floatingUpStudentId.current
       )!;
