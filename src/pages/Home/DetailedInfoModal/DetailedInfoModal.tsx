@@ -57,60 +57,56 @@ const DetailedInfoModal: React.FC<DetailedInfoModalProps> = memo(
 
     return (
       <FlowerModal centered open={open} onCancel={onCancel}>
-        {detailedInfo ? (
-          <Flex className={styles.flexInfoWrapper} vertical gap={8}>
-            {loading ? (
-              <Skeleton active />
-            ) : (
-              <>
-                <div className="name">{detailedInfo.name}</div>
+        <Flex className={styles.flexInfoWrapper} vertical gap={8}>
+          {loading ? (
+            <Skeleton active />
+          ) : detailedInfo ? (
+            <>
+              <div className="name">{detailedInfo.name}</div>
 
-                <div className="class-id">
-                  <Tooltip
-                    color="orange"
-                    title={
-                      classIdItemMap.has(detailedInfo.className)
-                        ? getClassDesc(
-                            classIdItemMap.get(detailedInfo.className)!
-                          )
-                        : "无班级信息"
-                    }
-                  >
-                    <span className="class-name">
-                      {detailedInfo.className}班
-                    </span>
-                  </Tooltip>
-                  {` ${detailedInfo.studentId}`}
-                </div>
-                <div className="location">
-                  <img className="img-location" src="/loc.svg" alt="loc" />
-                  {detailedInfo.city}
-                  {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
-                </div>
-                {detailedInfo.contact && (
-                  <>
-                    <Divider />
-                    <Flex vertical>
-                      <div>联系方式：</div>
-                      <div className="contact">{detailedInfo.contact}</div>
-                    </Flex>
-                  </>
-                )}
-                {detailedInfo.sentence && (
-                  <>
-                    <Divider />
-                    <Flex vertical>
-                      <div>毕业赠言：</div>
-                      <div className="sentence">{detailedInfo.sentence}</div>
-                    </Flex>
-                  </>
-                )}
-              </>
-            )}
-          </Flex>
-        ) : (
-          <div>暂无信息</div>
-        )}
+              <div className="class-id">
+                <Tooltip
+                  color="orange"
+                  title={
+                    classIdItemMap.has(detailedInfo.className)
+                      ? getClassDesc(
+                          classIdItemMap.get(detailedInfo.className)!
+                        )
+                      : "无班级信息"
+                  }
+                >
+                  <span className="class-name">{detailedInfo.className}班</span>
+                </Tooltip>
+                {` ${detailedInfo.studentId}`}
+              </div>
+              <div className="location">
+                <img className="img-location" src="/loc.svg" alt="loc" />
+                {detailedInfo.city}
+                {detailedInfo.mainwork && `，${detailedInfo.mainwork}`}
+              </div>
+              {detailedInfo.contact && (
+                <>
+                  <Divider />
+                  <Flex vertical>
+                    <div>联系方式：</div>
+                    <div className="contact">{detailedInfo.contact}</div>
+                  </Flex>
+                </>
+              )}
+              {detailedInfo.sentence && (
+                <>
+                  <Divider />
+                  <Flex vertical>
+                    <div>毕业赠言：</div>
+                    <div className="sentence">{detailedInfo.sentence}</div>
+                  </Flex>
+                </>
+              )}
+            </>
+          ) : (
+            <div>暂无信息</div>
+          )}
+        </Flex>
       </FlowerModal>
     );
   }
