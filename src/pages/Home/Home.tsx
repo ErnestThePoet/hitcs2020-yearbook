@@ -309,9 +309,6 @@ const Home: React.FC = () => {
           setFloatUpLabel(info.studentId, true);
         };
 
-        const mouseOverListener = () => setFloatUpLabel(info.studentId, true);
-        const mouseOutListener = () => setFloatUpLabel(info.studentId, false);
-
         const marker = new BMapGL.Marker(coordToPoint(info.coord), {
           icon: new BMapGL.Icon(
             "/star.svg",
@@ -335,12 +332,6 @@ const Home: React.FC = () => {
           });
 
           label.addEventListener("click", clickListener);
-
-          label.addEventListener("mouseover", mouseOverListener);
-          label.addEventListener("mouseout", mouseOutListener);
-
-          marker.addEventListener("mouseover", mouseOverListener);
-          marker.addEventListener("mouseout", mouseOutListener);
 
           marker.setLabel(label);
 
