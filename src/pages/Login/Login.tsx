@@ -46,7 +46,7 @@ const Login: React.FC = () => {
 
   return (
     <main className={styles.main}>
-      <title>登录 - 哈工大计算学部2020级同学录</title>
+      <title>登录 - 松花江畔CS2024届同学录</title>
       <div
         className={classNames(
           windowSize.vertical
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
           }
           align="center"
         >
-          <div className={styles.divTitle}>哈工大计算学部2020级同学录</div>
+          <div className={styles.divTitle}>松花江畔CS2024届同学录</div>
         </Flex>
         <Form
           className={classNames(styles.formLogin, {

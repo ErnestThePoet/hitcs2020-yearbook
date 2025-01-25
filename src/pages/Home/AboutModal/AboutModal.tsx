@@ -18,7 +18,7 @@ const AboutModal: React.FC<AboutModalProps> = memo(({ open, onCancel }) => {
       onCancel={onCancel}
     >
       <Flex className={styles.flexContentWrapper} vertical>
-        <div className="title">哈工大计算学部2020级同学录</div>
+        <div className="title">哈工大计算学部2024届同学录</div>
         <Flex gap={5} justify="center" wrap>
           前端开发/120L021615 崔子健
           <a
